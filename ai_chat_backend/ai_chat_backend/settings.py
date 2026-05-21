@@ -148,3 +148,21 @@ import os
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+
+    # Access token validity
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+
+    # Refresh token validity
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+
+    # Generate new refresh token when refreshed
+    "ROTATE_REFRESH_TOKENS": True,
+
+    # Blacklist old refresh tokens
+    "BLACKLIST_AFTER_ROTATION": True,
+
+}
