@@ -1,351 +1,331 @@
-import requests
-import time
-
-from django.conf import settings
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
-from rest_framework.generics import (
-    ListAPIView,
-    RetrieveAPIView,
-    DestroyAPIView
-)
+from rest_framework.generics import ListAPIView
+from rest_framework import status
 
 from .models import *
 from .serializers import *
 
-from analytics.models import APIUsage
+import google.generativeai as genai
+from django.conf import settings
+
+
+# Configure Gemini
+genai.configure(
+    api_key=settings.GEMINI_API_KEY
+)
+
+
+# ==========================
+# CHAT API
+# ==========================
 
 class ChatAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
-    def post(self, request):
-
-        serializer = ChatSerializer(
-            data=request.data
-        )
-
-        serializer.is_valid(
-            raise_exception=True
-        )
-
-        user_message = serializer.validated_data.get(
-            "message"
-        )
-
-        conversation_id = serializer.validated_data.get(
-            "conversation_id"
-        )
+    def post(self,request):
 
         try:
 
+            user_message=request.data.get(
+                "message"
+            )
+
+            if not user_message:
+
+                return Response(
+                    {
+                        "error":"Message required"
+                    },
+                    status=400
+                )
+
+
+            conversation_id=request.data.get(
+                "conversation_id"
+            )
+
+
+            # Existing conversation
             if conversation_id:
 
-                conversation = Conversation.objects.get(
+                conversation=Conversation.objects.get(
                     id=conversation_id,
                     user=request.user
                 )
 
             else:
 
-                selected_model = AIModel.objects.get(
-                    model_name='gemini-2.5-flash',
-                    is_active=True
-                )
-
-                conversation = Conversation.objects.create(
+                # New conversation
+                conversation=Conversation.objects.create(
                     user=request.user,
-                    title=user_message[:20],
-                    model=selected_model
+                    title=user_message[:30]
                 )
 
 
+            # Save user message
+
             Message.objects.create(
+
                 conversation=conversation,
-                role='user',
+                role="user",
                 content=user_message
+
             )
 
 
-            url = (
-                f"https://generativelanguage.googleapis.com/"
-                f"v1/models/"
-                f"{conversation.model.model_name}"
-                f":generateContent"
-                f"?key={settings.GEMINI_API_KEY}"
-            )
+            try:
 
-
-            data = {
-                "contents": [
-                    {
-                        "parts": [
-                            {
-                                "text": user_message
-                            }
-                        ]
-                    }
-                ]
-            }
-
-
-            start_time = time.time()
-
-
-            max_retries = 3
-
-            for attempt in range(max_retries):
-
-                response = requests.post(
-                    url,
-                    json=data
+                # Gemini model
+                model=genai.GenerativeModel(
+                    "gemini-2.5-flash"
                 )
 
-                result = response.json()
+                print("========== MODEL ==========")
+                print("Using model: gemini-2.5-flash")
+                print("===========================")
 
-                print(result)
-
-                if "error" in result:
-
-                    error_code = result["error"].get(
-                        "code"
-                    )
-
-                    if error_code == 503:
-
-                        time.sleep(3)
-
-                        if attempt < max_retries - 1:
-                            continue
-
-                break
-
-
-            end_time = time.time()
-
-
-            if "error" in result:
-
-                return Response(
-                    {
-                        "error":
-                        result["error"].get(
-                            "message"
-                        )
-                    },
-                    status=result["error"].get(
-                        "code",
-                        400
-                    )
+                response=model.generate_content(
+                    user_message
                 )
 
 
-            if "candidates" not in result:
+                ai_text=response.text
 
-                return Response(
-                    {
-                        "error":
-                        "No response from AI"
-                    },
-                    status=400
+
+            except Exception as e:
+
+                print(
+                    "========= GEMINI ERROR ========="
+                )
+
+                print(e)
+                print(type(e))
+
+                print(
+                    "================================"
                 )
 
 
-            ai_response = result[
-                "candidates"
-            ][0][
-                "content"
-            ][
-                "parts"
-            ][0][
-                "text"
-            ]
+                ai_text=f"""
+AI Service Error:
+
+{str(e)}
+"""
 
 
-            usage = result.get(
-                "usageMetadata",
-                {}
-            )
-
+            # Save AI response
 
             Message.objects.create(
-                conversation=conversation,
-                role='assistant',
-                content=ai_response,
-                token_count=usage.get(
-                    "totalTokenCount",
-                    0
-                ),
-                response_time=round(
-                    end_time-start_time,
-                    2
-                )
-            )
 
-
-            APIUsage.objects.create(
-                user=request.user,
                 conversation=conversation,
-                model=conversation.model.model_name,
-                prompt_tokens=usage.get(
-                    "promptTokenCount",
-                    0
-                ),
-                completion_tokens=usage.get(
-                    "candidatesTokenCount",
-                    0
-                ),
-                total_tokens=usage.get(
-                    "totalTokenCount",
-                    0
-                )
+                role="assistant",
+                content=ai_text
+
             )
 
 
             return Response({
 
-                "conversation_id":
-                str(
-                    conversation.id
-                ),
+                "response":ai_text,
+                "conversation_id":conversation.id
 
-                "title":
-                conversation.title,
+            })
 
-                "response":
-                ai_response,
 
-                "token_usage": {
+        except Exception as e:
 
-                    "prompt_tokens":
-                    usage.get(
-                        "promptTokenCount",
-                        0
-                    ),
+            print("CHAT ERROR:",e)
 
-                    "completion_tokens":
-                    usage.get(
-                        "candidatesTokenCount",
-                        0
-                    ),
+            return Response({
 
-                    "total_tokens":
-                    usage.get(
-                        "totalTokenCount",
-                        0
-                    )
+                "error":"Something went wrong"
 
-                }
+            },status=500)
+
+
+
+# ==========================
+# HISTORY SIDEBAR
+# ==========================
+
+class ConversationListView(ListAPIView):
+
+    permission_classes=[IsAuthenticated]
+
+    serializer_class=ConversationSerializer
+
+
+    def get_queryset(self):
+
+        return Conversation.objects.filter(
+            user=self.request.user
+        ).order_by(
+            "-created_at"
+        )
+
+
+
+# ==========================
+# OPEN CHAT
+# ==========================
+
+class ConversationHistoryView(APIView):
+
+    permission_classes=[IsAuthenticated]
+
+
+    def get(self,request,id):
+
+        try:
+
+            conversation=Conversation.objects.get(
+                id=id,
+                user=request.user
+            )
+
+
+            messages=Message.objects.filter(
+                conversation=conversation
+            )
+
+
+            data=[]
+
+
+            for msg in messages:
+
+                data.append({
+
+                    "role":msg.role,
+                    "content":msg.content,
+                    "timestamp":msg.created_at
+
+                })
+
+
+            return Response({
+
+                "id":str(conversation.id),
+                "title":conversation.title,
+                "messages":data
 
             })
 
 
         except Conversation.DoesNotExist:
 
-            return Response(
-                {
-                    "error":
-                    "Conversation not found"
-                },
-                status=404
-            )
+            return Response({
 
+                "error":"Conversation not found"
 
-        except AIModel.DoesNotExist:
-
-            return Response(
-                {
-                    "error":
-                    "AI model not found"
-                },
-                status=404
-            )
-
-
-        except Exception as e:
-
-            return Response(
-                {
-                    "error":
-                    str(e)
-                },
-                status=500
-            )
-
-class ConversationListView(ListAPIView):
-
-    permission_classes = [IsAuthenticated]
-
-    serializer_class = ConversationSerializer
-
-
-    def get_queryset(self):
-
-        return Conversation.objects.filter(
-            user=self.request.user
-        ).order_by('-created_at')
+            },status=404)
 
 
 
-
-class ConversationHistoryView(RetrieveAPIView):
-
-    permission_classes = [IsAuthenticated]
-
-    serializer_class = ConversationSerializer
-
-    lookup_field = 'id'
-
-
-    def get_queryset(self):
-
-        return Conversation.objects.filter(
-            user=self.request.user
-        )
-
-
-
+# ==========================
+# DELETE CHAT
+# ==========================
 
 class DeleteConversationView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
-    def delete(self, request, id):
+
+    def delete(self,request,id):
 
         try:
 
-            conversation = Conversation.objects.get(
+            conversation=Conversation.objects.get(
                 id=id,
                 user=request.user
             )
 
             conversation.delete()
 
-            return Response(
-                {
-                    "message": "Conversation deleted successfully"
-                },
-                status=200
-            )
+            return Response({
+
+                "message":"Deleted"
+
+            })
+
 
         except Conversation.DoesNotExist:
 
-            return Response(
-                {
-                    "error": "Conversation not found"
-                },
-                status=404
+            return Response({
+
+                "error":"Conversation not found"
+
+            },status=404)
+
+
+
+# ==========================
+# RENAME CHAT
+# ==========================
+
+class RenameConversationView(APIView):
+
+    permission_classes=[IsAuthenticated]
+
+
+    def patch(self,request,id):
+
+        try:
+
+            conversation=Conversation.objects.get(
+                id=id,
+                user=request.user
             )
-        
+
+
+            title=request.data.get(
+                "title"
+            )
+
+
+            if not title:
+
+                return Response({
+
+                    "error":"Title required"
+
+                },status=400)
+
+
+            conversation.title=title
+            conversation.save()
+
+
+            return Response({
+
+                "message":"Renamed"
+
+            })
+
+
+        except Conversation.DoesNotExist:
+
+            return Response({
+
+                "error":"Conversation not found"
+
+            },status=404)
+
+
+
+# ==========================
+# AI MODEL LIST
+# ==========================
+
 class AIModelListView(ListAPIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
-    serializer_class = AIModelSerializer
+    serializer_class=AIModelSerializer
 
-    queryset = AIModel.objects.filter(
+    queryset=AIModel.objects.filter(
         is_active=True
     )

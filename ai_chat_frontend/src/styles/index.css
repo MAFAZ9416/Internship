@@ -1,0 +1,236 @@
+@import "tailwindcss";
+
+/* ============================================
+   AI Chat - Custom Design System
+   ============================================ */
+
+@import "tailwindcss";
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:#030b1f;
+color:white;
+font-family:Arial,sans-serif;
+}
+
+@theme {
+  /* Color Palette */
+  --color-bg-primary: #030b1f;
+  --color-bg-secondary: #0a1628;
+  --color-bg-tertiary: #111d35;
+  --color-bg-card: #0d1a2f;
+  --color-bg-hover: #142240;
+  --color-bg-active: #1a2d4f;
+  --color-bg-input: #0c1626;
+  --color-bg-overlay: rgba(3, 11, 31, 0.85);
+
+  --color-border-primary: #1a2d4f;
+  --color-border-secondary: #253a5c;
+  --color-border-subtle: #0f1e38;
+
+  --color-text-primary: #e8ecf4;
+  --color-text-secondary: #8a9ab5;
+  --color-text-muted: #5a6d8a;
+  --color-text-accent: #6c8cff;
+
+  --color-accent-blue: #4f7cff;
+  --color-accent-blue-hover: #6a90ff;
+  --color-accent-purple: #7c5cff;
+  --color-accent-cyan: #38bdf8;
+  --color-accent-green: #34d399;
+  --color-accent-red: #f87171;
+  --color-accent-amber: #fbbf24;
+
+  --color-user-bubble: #1e3a6e;
+  --color-ai-bubble: #0d1a2f;
+
+  --color-gradient-start: #4f7cff;
+  --color-gradient-end: #7c5cff;
+
+  /* Shadows */
+  --shadow-glow: 0 0 20px rgba(79, 124, 255, 0.15);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-input: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Animations */
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-up: slide-up 0.4s ease-out;
+  --animate-slide-left: slide-left 0.3s ease-out;
+  --animate-slide-right: slide-right 0.3s ease-out;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-typing: typing 1.4s ease-in-out infinite;
+  --animate-bounce-in: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --animate-shimmer: shimmer 1.5s ease-in-out infinite;
+  --animate-scale-in: scale-in 0.2s ease-out;
+}
+
+/* Keyframe Animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(79, 124, 255, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(79, 124, 255, 0.6); }
+}
+
+@keyframes typing {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+@keyframes bounce-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-primary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-secondary);
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(79, 124, 255, 0.3);
+  color: #fff;
+}
+
+/* Focus Styles */
+*:focus-visible {
+  outline: 2px solid var(--color-accent-blue);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+.glass {
+  background: rgba(13, 26, 47, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(26, 45, 79, 0.5);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-tertiary) 25%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-tertiary) 75%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}

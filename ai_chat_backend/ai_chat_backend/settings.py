@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_spectacular',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = 'ai_chat_backend.urls'
@@ -130,16 +132,17 @@ from datetime import timedelta
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
-}
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 
     'DEFAULT_SCHEMA_CLASS':
-    'drf_spectacular.openapi.AutoSchema'
+    'drf_spectacular.openapi.AutoSchema',
+
+    'DEFAULT_PERMISSION_CLASSES': (
+
+        "rest_framework.permissions.AllowAny"
+
+    )
+
 }
 
 from dotenv import load_dotenv
@@ -166,3 +169,12 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 
 }
+
+CORS_ALLOWED_ORIGINS = [
+
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+
+]
+
+CORS_ALLOW_CREDENTIALS = True

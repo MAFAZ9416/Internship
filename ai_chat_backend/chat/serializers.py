@@ -4,11 +4,12 @@ from .models import *
 
 class ChatSerializer(serializers.Serializer):
 
-    conversation_id = serializers.UUIDField(
-        required=False
-    )
-
     message = serializers.CharField()
+
+    conversation_id = serializers.UUIDField(
+        required=False,
+        allow_null=True
+    )
 
 
 class MessageSerializer(serializers.ModelSerializer):

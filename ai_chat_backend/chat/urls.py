@@ -4,32 +4,46 @@ from .views import *
 
 urlpatterns = [
 
+    # Chat API
     path(
-        'chat/',
+        "",
         ChatAPIView.as_view(),
-        name='chat'
+        name="chat"
     ),
 
+    # History list
     path(
-        'history/',
+        "history/",
         ConversationListView.as_view(),
-        name='history-list'
+        name="history"
     ),
 
+    # Open conversation
     path(
-        'history/<uuid:id>/',
+        "history/<uuid:id>/",
         ConversationHistoryView.as_view(),
-        name='history-detail'
+        name="conversation-history"
+    ),
+
+    # Delete conversation
+    path(
+        "history/<uuid:id>/delete/",
+        DeleteConversationView.as_view(),
+        name="delete-conversation"
+    ),
+
+    # AI models
+    path(
+        "models/",
+        AIModelListView.as_view(),
+        name="models"
     ),
 
     path(
-        'history/delete/<uuid:id>/',
-        DeleteConversationView.as_view(),
-        name='history-delete'
-    ),
-    
-    path(
-        'models/',
-        AIModelListView.as_view()
-    ),
+    "history/<uuid:id>/rename/",
+    RenameConversationView.as_view(),
+    name="rename-conversation"
+),
+
+
 ]
