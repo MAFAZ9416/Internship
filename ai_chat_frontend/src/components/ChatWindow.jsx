@@ -1,110 +1,148 @@
 import MessageBubble from "./MessageBubble";
 
 export default function ChatWindow({
-  messages = [],
-  isTyping = false
-}) {
+messages,
+isTyping,
+onEditMessage
+}){
 
-return (
+return(
 
 <div
 className="
 flex-1
 overflow-y-auto
 p-6
-space-y-4
-bg-[#020c1b]
+pt-20
 "
 >
 
 {
-messages.length===0 && (
+
+messages.length===0
+
+?
 
 <div
 className="
 h-full
 flex
-items-center
+flex-col
 justify-center
+items-center
 text-center
-text-gray-400
 "
 >
 
-<div>
+<div className="text-6xl mb-4">
 
-<h2 className="text-4xl mb-3">
 💬
-</h2>
 
-<h2 className="text-3xl font-bold text-blue-400">
+</div>
+
+<h1
+className="
+text-4xl
+font-bold
+text-blue-400
+mb-3
+"
+>
+
 Start a Conversation
-</h2>
 
-<p className="mt-2">
+</h1>
+
+<p
+className="
+text-gray-400
+text-xl
+"
+>
+
 Ask me anything! I'm here to help.
+
 </p>
 
 </div>
 
-</div>
+:
 
-)
-}
+messages.map(
 
-{
-messages.map((message,index)=>(
+(message,index)=>(
 
 <MessageBubble
-key={index}
+
+key={
+message.id || index
+}
+
 message={message}
-isUser={message.role==="user"}
+
+isUser={
+message.role==="user"
+}
+
+onEditMessage={
+onEditMessage
+}
+
 />
 
-))
+)
+
+)
+
 }
+
 
 {
+
 isTyping && (
 
-<div className="flex gap-3">
+<div className="flex gap-2 ml-3">
 
 <div
 className="
-w-8
-h-8
+w-2
+h-2
 rounded-full
 bg-blue-500
-flex
-items-center
-justify-center
-text-white
+animate-bounce
 "
->
-AI
-</div>
+/>
 
 <div
 className="
-bg-[#111827]
-rounded-2xl
-px-4
-py-3
-text-white
+w-2
+h-2
+rounded-full
+bg-blue-500
+animate-bounce
+delay-100
 "
->
+/>
 
-Typing...
-
-</div>
+<div
+className="
+w-2
+h-2
+rounded-full
+bg-blue-500
+animate-bounce
+delay-200
+"
+/>
 
 </div>
 
 )
+
 }
 
 </div>
 
-)
+);
 
 }

@@ -11,6 +11,20 @@ urlpatterns = [
         name="chat"
     ),
 
+    # Edit message
+    path(
+        "message/<int:id>/edit/",
+        EditMessageView.as_view(),
+        name="edit-message"
+    ),
+
+    # File Upload
+    path(
+        "upload/",
+        FileUploadView.as_view(),
+        name="file-upload"
+    ),
+
     # History list
     path(
         "history/",
@@ -32,6 +46,20 @@ urlpatterns = [
         name="delete-conversation"
     ),
 
+    # Archive conversation
+    path(
+        "history/<uuid:id>/archive/",
+        ArchiveConversationView.as_view(),
+        name="archive-conversation"
+    ),
+
+    # Restore conversation
+    path(
+        "history/<uuid:id>/restore/",
+        RestoreConversationView.as_view(),
+        name="restore-conversation"
+    ),
+
     # AI models
     path(
         "models/",
@@ -40,10 +68,10 @@ urlpatterns = [
     ),
 
     path(
-    "history/<uuid:id>/rename/",
-    RenameConversationView.as_view(),
-    name="rename-conversation"
-),
+        "history/<uuid:id>/rename/",
+        RenameConversationView.as_view(),
+        name="rename-conversation"
+    ),
 
 
 ]

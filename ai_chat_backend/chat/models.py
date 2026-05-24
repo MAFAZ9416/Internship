@@ -50,6 +50,15 @@ class Conversation(models.Model):
         auto_now=True
     )
 
+    is_archived = models.BooleanField(
+        default=False
+    )
+
+    archived_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
 
 class Message(models.Model):
 
@@ -83,3 +92,46 @@ class Message(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+    edited_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    original_content = models.TextField(
+        null=True,
+        blank=True
+    )
+
+
+class UploadedFile(models.Model):
+
+    conversation = models.ForeignKey(
+        Conversation,
+        on_delete=models.CASCADE,
+        related_name="uploaded_files"
+    )
+
+    file = models.FileField(
+        upload_to="chat_uploads/"
+    )
+
+    file_name = models.CharField(
+        max_length=255
+    )
+
+    file_type = models.CharField(
+        max_length=50
+    )
+
+    file_size = models.IntegerField()
+
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ['-uploaded_at']
+
+    def __str__(self):
+        return self.file_name

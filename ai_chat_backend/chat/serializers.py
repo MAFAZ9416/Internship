@@ -24,8 +24,48 @@ class MessageSerializer(serializers.ModelSerializer):
             'content',
             'token_count',
             'response_time',
-            'created_at'
+            'created_at',
+            'edited_at',
+            'original_content'
         ]
+
+
+class UploadedFileSerializer(serializers.ModelSerializer):
+
+    file_size_display = serializers.SerializerMethodField()
+
+    class Meta:
+
+        model = UploadedFile
+
+        fields = [
+            'id',
+            'file',
+            'file_name',
+            'file_type',
+            'file_size',
+            'file_size_display',
+            'uploaded_at'
+        ]
+
+        read_only_fields = [
+            'id',
+            'file',
+            'file_name',
+            'file_type',
+            'file_size',
+            'file_size_display',
+            'uploaded_at'
+        ]
+
+    def get_file_size_display(self, obj):
+        """Convert bytes to human-readable format"""
+        size = obj.file_size
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if size < 1024.0:
+                return f"{size:.2f} {unit}"
+            size /= 1024.0
+        return f"{size:.2f} TB"
 
 
 
@@ -33,6 +73,11 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     messages = MessageSerializer(
         source='message_set',
+        many=True,
+        read_only=True
+    )
+
+    uploaded_files = UploadedFileSerializer(
         many=True,
         read_only=True
     )
@@ -48,7 +93,10 @@ class ConversationSerializer(serializers.ModelSerializer):
             'system_prompt',
             'created_at',
             'updated_at',
-            'messages'
+            'is_archived',
+            'archived_at',
+            'messages',
+            'uploaded_files'
         ]
 
 class AIModelSerializer(serializers.ModelSerializer):
