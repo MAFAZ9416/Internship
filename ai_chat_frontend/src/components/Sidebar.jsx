@@ -38,7 +38,6 @@ export default function Sidebar({
 
 }) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [archivedSearchQuery, setArchivedSearchQuery] = useState("");
   const [isResizing, setIsResizing] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -154,12 +153,14 @@ export default function Sidebar({
     });
   }, [pinnedConversations, searchQuery]);
 
-  const filteredArchived = useMemo(() => {
-    return archivedConversations.filter((conversation) => {
-      const title = conversation.title || "New Chat";
-      return title.toLowerCase().includes(archivedSearchQuery.toLowerCase());
-    });
-  }, [archivedConversations, archivedSearchQuery]);
+    const filteredArchived=
+useMemo(()=>{
+
+return archivedConversations;
+
+},[
+archivedConversations
+]);
 
   // Render conversation item
   const renderConversationItem = (conversation, isPinned = false) => {
@@ -387,87 +388,120 @@ export default function Sidebar({
             </div>
 
             {/* Archived section */}
-            {archivedConversations.length > 0 && (
-              <div className="px-2 py-3 border-t border-gray-700">
-                <h3 className="text-xs text-gray-400 px-3 py-2 font-semibold">
-                  📦 ARCHIVED ({archivedConversations.length})
-                </h3>
-                <div className="relative px-3 pb-2">
-                  <FaSearch
-                    className="absolute left-6 top-3 text-gray-500"
-                    size={12}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search archived..."
-                    value={archivedSearchQuery}
-                    onChange={(e) => setArchivedSearchQuery(e.target.value)}
-                    className="
-                      w-full
-                      pl-8
-                      p-2
-                      rounded-lg
-                      bg-[#111827]
-                      border
-                      border-gray-700
-                      text-white
-                      outline-none
-                      text-xs
-                    "
-                  />
-                </div>
-                {filteredArchived.map((conversation) => {
-                  const id = conversation.id;
-                  const title = conversation.title;
-                  const active = id === activeConversationId;
 
-                  return (
-                    <div
-                      key={id}
-                      onClick={() => handleSelectConversation(id)}
-                      className={`
-                        group
-                        flex
-                        justify-between
-                        items-center
-                        p-3
-                        rounded-lg
-                        cursor-pointer
-                        mb-2
-                        transition
-                        ${active ? "bg-blue-700" : "hover:bg-[#1E293B]"}
-                      `}
-                    >
-                      <span className="truncate text-sm text-gray-300 flex-1">
-                        {title}
-                      </span>
-                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onRestoreConversation(id);
-                          }}
-                          className="text-green-400 hover:text-green-300"
-                          title="Restore"
-                        >
-                          <FaUndo size={13} />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onDeleteConversation(id);
-                          }}
-                          className="text-red-400 hover:text-red-300"
-                          title="Delete permanently"
-                        >
-                          <FaTrash size={13} />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+{archivedConversations.length > 0 && (
+  <div className="px-2 py-3 border-t border-gray-700">
+
+    <h3
+      className="
+      text-xs
+      text-gray-400
+      px-3
+      py-2
+      font-semibold
+      "
+    >
+      📦 ARCHIVED ({archivedConversations.length})
+    </h3>
+
+    {filteredArchived.map((conversation) => {
+
+      const id = conversation.id;
+      const title = conversation.title;
+      const active = id === activeConversationId;
+
+      return(
+
+        <div
+          key={id}
+          onClick={() =>
+            handleSelectConversation(id)
+          }
+          className={`
+            group
+            flex
+            justify-between
+            items-center
+            p-3
+            rounded-lg
+            cursor-pointer
+            mb-2
+            transition
+            ${
+              active
+              ?
+              "bg-blue-700"
+              :
+              "hover:bg-[#1E293B]"
+            }
+          `}
+        >
+
+          <span
+            className="
+            truncate
+            text-sm
+            text-gray-300
+            flex-1
+            "
+          >
+            {title}
+          </span>
+
+          <div
+            className="
+            flex
+            gap-2
+            opacity-0
+            group-hover:opacity-100
+            transition
+            "
+          >
+
+            <button
+              onClick={(e)=>{
+
+                e.stopPropagation();
+
+                onRestoreConversation(id);
+
+              }}
+              className="
+              text-green-400
+              hover:text-green-300
+              "
+              title="Restore"
+            >
+              <FaUndo size={13}/>
+            </button>
+
+            <button
+              onClick={(e)=>{
+
+                e.stopPropagation();
+
+                onDeleteConversation(id);
+
+              }}
+              className="
+              text-red-400
+              hover:text-red-300
+              "
+              title="Delete permanently"
+            >
+              <FaTrash size={13}/>
+            </button>
+
+          </div>
+
+        </div>
+
+      );
+
+    })}
+
+  </div>
+)}
           </div>
 
           {/* Footer */}
@@ -581,107 +615,135 @@ export default function Sidebar({
           </div>
         )}
 
-        {/* Archived section (collapsible) */}
-      {archivedConversations.length > 0 && (
-        <div className="border-t border-gray-700 p-2">
-          <button
-            onClick={() => onToggleShowArchivedChats?.(!showArchivedChats)}
-            className="
-              w-full
-              text-left
-              text-xs
-              text-gray-400
-              px-3
-              py-2
-              font-semibold
-              hover:text-gray-300
-              transition
-            "
-          >
-            📦 ARCHIVED ({archivedConversations.length})
-          </button>
+        {/* ARCHIVED */}
 
-          {showArchivedChats && (
-            <div className="mt-2">
-              <div className="relative px-2 pb-2">
-                <FaSearch
-                  className="absolute left-5 top-3 text-gray-500"
-                  size={12}
-                />
-                <input
-                  type="text"
-                  placeholder="Search archived..."
-                  value={archivedSearchQuery}
-                  onChange={(e) => setArchivedSearchQuery(e.target.value)}
-                  className="
-                    w-full
-                    pl-8
-                    p-2
-                    rounded-lg
-                    bg-[#111827]
-                    border
-                    border-gray-700
-                    text-white
-                    outline-none
-                    text-xs
-                  "
-                />
-              </div>
+{archivedConversations.length > 0 && (
 
-              {filteredArchived.map((conversation) => {
-                const id = conversation.id;
-                const title = conversation.title;
-                const active = id === activeConversationId;
+<div className="mt-4">
 
-                return (
-                  <div
-                    key={id}
-                    onClick={() => handleSelectConversation(id)}
-                    className={`
-                      group
-                      flex
-                      justify-between
-                      items-center
-                      p-3
-                      rounded-lg
-                      cursor-pointer
-                      mb-2
-                      transition
-                      ${active ? "bg-blue-700" : "hover:bg-[#1E293B]"}
-                    `}
-                  >
-                    <span className="truncate text-sm text-gray-300 flex-1">
-                      {title}
-                    </span>
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onRestoreConversation(id);
-                        }}
-                        className="text-green-400 hover:text-green-300"
-                        title="Restore"
-                      >
-                        <FaUndo size={13} />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteConversation(id);
-                        }}
-                        className="text-red-400 hover:text-red-300"
-                        title="Delete permanently"
-                      >
-                        <FaTrash size={13} />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
+<hr className="my-2 border-gray-700"/>
+
+<button
+onClick={() =>
+onToggleShowArchivedChats?.(
+!showArchivedChats
+)
+}
+className="
+w-full
+text-left
+text-xs
+text-gray-400
+px-3
+py-2
+font-semibold
+hover:text-gray-300
+transition
+"
+>
+
+📦 ARCHIVED
+({archivedConversations.length})
+
+</button>
+
+
+{showArchivedChats && (
+
+<div className="mt-2">
+
+{filteredArchived.map((conversation)=>{
+
+const id=conversation.id;
+const title=conversation.title;
+const active=id===activeConversationId;
+
+return(
+
+<div
+key={id}
+onClick={() =>
+handleSelectConversation(id)
+}
+className={`
+group
+flex
+justify-between
+items-center
+p-3
+rounded-lg
+cursor-pointer
+mb-2
+transition
+${active
+? "bg-blue-700"
+: "hover:bg-[#1E293B]"
+}
+`}
+>
+
+<span
+className="
+truncate
+text-sm
+text-gray-300
+flex-1
+"
+>
+{title}
+</span>
+
+<div
+className="
+flex
+gap-2
+opacity-0
+group-hover:opacity-100
+transition
+"
+>
+
+<button
+onClick={(e)=>{
+e.stopPropagation();
+onRestoreConversation(id);
+}}
+className="
+text-green-400
+hover:text-green-300
+"
+>
+<FaUndo size={13}/>
+</button>
+
+<button
+onClick={(e)=>{
+e.stopPropagation();
+onDeleteConversation(id);
+}}
+className="
+text-red-400
+hover:text-red-300
+"
+>
+<FaTrash size={13}/>
+</button>
+
+</div>
+
+</div>
+
+)
+
+})}
+
+</div>
+
+)}
+
+</div>
+
+)}
 
         <h3 className="text-xs text-gray-400 px-3 py-2 font-semibold">
           RECENT CHATS
