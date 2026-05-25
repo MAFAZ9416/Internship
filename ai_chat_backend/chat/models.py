@@ -112,17 +112,18 @@ class Message(models.Model):
         blank=True
     )
 
-
 class UploadedFile(models.Model):
 
-    conversation = models.ForeignKey(
-        Conversation,
+    message = models.ForeignKey(
+        Message,
         on_delete=models.CASCADE,
-        related_name="uploaded_files"
+        related_name='files',
+        null=True,
+        blank=True
     )
 
     file = models.FileField(
-        upload_to="chat_uploads/"
+        upload_to='uploads/'
     )
 
     file_name = models.CharField(
@@ -133,14 +134,4 @@ class UploadedFile(models.Model):
         max_length=50
     )
 
-    file_size = models.IntegerField()
-
-    uploaded_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    class Meta:
-        ordering = ['-uploaded_at']
-
-    def __str__(self):
-        return self.file_name
+    file_size = models.BigIntegerField()

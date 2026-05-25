@@ -57,39 +57,22 @@ class UploadedFileSerializer(serializers.ModelSerializer):
         return f"{size:.2f} TB"
 
 
-
 class MessageSerializer(serializers.ModelSerializer):
-
-    files=UploadedFileSerializer(
-
-        source="uploaded_files",
-
-        many=True,
-
-        read_only=True
-
-    )
-
 
     class Meta:
 
-        model=Message
+        model = Message
 
-        fields=[
-
-            "id",
-            "role",
-            "content",
-            "token_count",
-            "response_time",
-            "created_at",
-            "edited_at",
-            "original_content",
-            "files"
-
+        fields = [
+            'id',
+            'role',
+            'content',
+            'token_count',
+            'response_time',
+            'created_at',
+            'edited_at',
+            'original_content'
         ]
-
-
 
 class ConversationSerializer(serializers.ModelSerializer):
 
@@ -103,14 +86,7 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     )
 
-    uploaded_files=UploadedFileSerializer(
-
-        many=True,
-
-        read_only=True
-
-    )
-
+    uploaded_files = serializers.SerializerMethodField()
 
     class Meta:
 
@@ -132,6 +108,13 @@ class ConversationSerializer(serializers.ModelSerializer):
             "uploaded_files"
 
         ]
+
+    def get_uploaded_files(self, obj):
+        return UploadedFileSerializer(
+            UploadedFile.objects.filter(message__conversation=obj),
+            many=True
+        ).data
+
 
 
 

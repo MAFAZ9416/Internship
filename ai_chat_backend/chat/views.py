@@ -74,6 +74,7 @@ class ChatAPIView(APIView):
                 )
 
 
+            # Create user message
             user_msg=Message.objects.create(
 
                 conversation=conversation,
@@ -85,9 +86,10 @@ class ChatAPIView(APIView):
             )
 
 
+            # Get files correctly through Message relation
             uploaded_files=UploadedFile.objects.filter(
 
-                conversation=conversation
+                message__conversation=conversation
 
             )
 
@@ -149,13 +151,17 @@ User:
 
             except Exception as e:
 
-                print(e)
+                print(
+                    "GEMINI ERROR:",
+                    e
+                )
 
                 ai_text=f"AI Error: {str(e)}"
 
 
 
-            Message.objects.create(
+            # Save AI response
+            ai_msg=Message.objects.create(
 
                 conversation=conversation,
 
@@ -175,7 +181,10 @@ User:
                 ai_text,
 
                 "conversation_id":
-                str(conversation.id)
+                str(conversation.id),
+
+                "ai_message_id":
+                str(ai_msg.id)
 
             })
 
@@ -190,7 +199,7 @@ User:
             return Response({
 
                 "error":
-                "Something went wrong"
+                str(e)
 
             },status=500)
 
@@ -219,6 +228,7 @@ class ConversationListView(ListAPIView):
 # OPEN CHAT
 # ==========================
 
+
 class ConversationHistoryView(APIView):
 
     permission_classes=[IsAuthenticated]
@@ -243,6 +253,13 @@ class ConversationHistoryView(APIView):
                 many=True
             )
 
+            uploaded_files=UploadedFileSerializer(
+                UploadedFile.objects.filter(
+                    message__conversation=conversation
+                ),
+                many=True
+            ).data
+
             return Response({
 
                 "id":
@@ -255,22 +272,22 @@ class ConversationHistoryView(APIView):
                 serializer.data,
 
                 "uploaded_files":
-                UploadedFileSerializer(
-                    conversation.uploaded_files.all(),
-                    many=True
-                ).data
+                uploaded_files
 
             })
 
         except Conversation.DoesNotExist:
 
-            return Response({
+            return Response(
 
-                "error":
-                "Conversation not found"
+                {
+                    "error":
+                    "Conversation not found"
+                },
 
-            },status=404)
+                status=404
 
+            )
 
 # ==========================
 # DELETE CHAT
@@ -571,8 +588,13 @@ class FileUploadView(APIView):
 
                 # Create UploadedFile record
                 try:
-                    uploaded_file = UploadedFile.objects.create(
+                    last_msg = Message.objects.filter(
                         conversation=conversation,
+                        role='user'
+                    ).order_by('-created_at').first()
+
+                    uploaded_file = UploadedFile.objects.create(
+                        message=last_msg,
                         file=file,
                         file_name=file.name,
                         file_type=file_ext,
@@ -671,7 +693,8 @@ class EditMessageView(APIView):
             # Find and delete the next AI response message
             ai_response = Message.objects.filter(
                 conversation=conversation,
-                role='assistant'
+                role='assistant',
+                created_at__gt=user_message.created_at
             ).order_by('created_at').first()
 
             if ai_response:

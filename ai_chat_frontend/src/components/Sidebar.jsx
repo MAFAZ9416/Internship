@@ -10,8 +10,10 @@ import {
   FaSearch,
   FaStar,
   FaBars,
-  FaTimes
+  FaTimes,
+  FaComments
 } from "react-icons/fa";
+import { RiLogoutBoxLine } from "react-icons/ri";
 
 export default function Sidebar({
   conversations = [],
@@ -43,9 +45,8 @@ export default function Sidebar({
 
   const sidebarRef = useRef(null);
   const { user, logout } = useAuth();
-
-  // Check if mobile
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const theme = localStorage.getItem("theme") || "dark";
 
   useEffect(() => {
     const handleResize = () => {
@@ -56,13 +57,25 @@ export default function Sidebar({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Initialize sidebar collapse state from localStorage
+  useEffect(() => {
+    const savedCollapsed = localStorage.getItem("sidebarCollapsed");
+    if (savedCollapsed !== null) {
+      onToggleCollapsed?.(JSON.parse(savedCollapsed));
+    }
+  }, []);
+
+  const handleToggleCollapse = () => {
+    const newState = !isCollapsed;
+    localStorage.setItem("sidebarCollapsed", JSON.stringify(newState));
+    onToggleCollapsed?.(newState);
+  };
+
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isResizing) return;
-
       const newWidth = e.clientX;
-
-      if (newWidth > 200 && newWidth < 600) {
+      if (newWidth > 220 && newWidth < 500) {
         onSidebarWidthChange?.(newWidth);
       }
     };
@@ -74,7 +87,6 @@ export default function Sidebar({
     if (isResizing) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
-
       return () => {
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
@@ -82,7 +94,6 @@ export default function Sidebar({
     }
   }, [isResizing, onSidebarWidthChange]);
 
-  // Close mobile sidebar on conversation select
   const handleSelectConversation = (id) => {
     onSelectConversation(id);
     if (isMobile) {
@@ -92,14 +103,12 @@ export default function Sidebar({
 
   const renameConversation = async (id) => {
     const newName = prompt("Enter new chat name");
-
     if (!newName?.trim()) return;
 
     try {
       await api.patch(`history/${id}/rename/`, {
         title: newName
       });
-
       window.location.reload();
     } catch (error) {
       console.log(error);
@@ -153,373 +162,268 @@ export default function Sidebar({
     });
   }, [pinnedConversations, searchQuery]);
 
-    const filteredArchived=
-useMemo(()=>{
+  const filteredArchived = useMemo(() => {
+    return archivedConversations;
+  }, [archivedConversations]);
 
-return archivedConversations;
-
-},[
-archivedConversations
-]);
-
-  // Render conversation item
+  // Render conversation item with Sparkle/Active highlights and responsive controls
   const renderConversationItem = (conversation, isPinned = false) => {
     const id = conversation.id;
-    const title = conversation.title;
+    const title = conversation.title || "Untitled Conversation";
     const active = id === activeConversationId;
 
     return (
       <div
         key={id}
         onClick={() => handleSelectConversation(id)}
-        className={`
-          group
-          flex
-          justify-between
-          items-center
-          p-3
-          rounded-lg
-          cursor-pointer
-          mb-2
-          transition
-          ${active ? "bg-blue-700" : "hover:bg-[#1E293B]"}
-        `}
+        className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer mb-2.5 transition-all duration-200 select-none ${
+          active 
+            ? "bg-gradient-to-r from-blue-600/90 to-purple-600/90 text-white shadow-md shadow-blue-500/10 border-l-4 border-blue-400" 
+            : theme === "dark" 
+              ? "hover:bg-gray-800/60 border-l-4 border-transparent text-gray-200" 
+              : "hover:bg-slate-200/80 border-l-4 border-transparent text-slate-700"
+        }`}
       >
-        <span className="truncate text-sm text-white flex-1">
-          {title}
-        </span>
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <span className="text-sm text-gray-400 group-hover:text-white flex-shrink-0">💬</span>
+          <span className="truncate text-sm font-medium flex-1 pr-2">{title}</span>
+        </div>
 
-        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition flex-shrink-0">
+        <div className="flex gap-2.5 opacity-0 group-hover:opacity-100 transition duration-150 flex-shrink-0">
           {!isPinned ? (
             <button
               onClick={(e) => handlePin(e, id)}
-              className="text-yellow-400 hover:text-yellow-300"
+              className="text-gray-400 hover:text-yellow-400"
               title="Pin chat"
             >
-              <FaStar size={13} />
+              <FaStar size={12} />
             </button>
           ) : (
             <button
               onClick={(e) => handleUnpin(e, id)}
-              className="text-yellow-400"
+              className="text-yellow-400 hover:text-gray-300"
               title="Unpin chat"
             >
-              <FaStar size={13} />
+              <FaStar size={12} />
             </button>
           )}
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              renameConversation(id);
-            }}
-            className="text-blue-400 hover:text-blue-300"
+            onClick={(e) => { e.stopPropagation(); renameConversation(id); }}
+            className="text-gray-400 hover:text-blue-400"
             title="Rename chat"
           >
-            <FaEdit size={13} />
+            <FaEdit size={12} />
           </button>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onArchiveConversation(id);
-            }}
-            className="text-yellow-500 hover:text-yellow-400"
+            onClick={(e) => { e.stopPropagation(); onArchiveConversation(id); }}
+            className="text-gray-400 hover:text-orange-400"
             title="Archive chat"
           >
-            <FaArchive size={13} />
+            <FaArchive size={12} />
           </button>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDeleteConversation(id);
-            }}
-            className="text-red-400 hover:text-red-300"
+            onClick={(e) => { e.stopPropagation(); onDeleteConversation(id); }}
+            className="text-gray-400 hover:text-red-400"
             title="Delete chat"
           >
-            <FaTrash size={13} />
+            <FaTrash size={12} />
           </button>
         </div>
       </div>
     );
   };
 
-  // Mobile hamburger button
+  // Profile Card Component placed inside Sidebar
+  const renderProfileCard = () => (
+    <div className={`p-5 mx-2 rounded-2xl border transition-all duration-300 backdrop-blur-sm ${
+      theme === "dark" 
+        ? "bg-[#0d1a2f]/60 border-purple-500/20 hover:border-purple-500/40 shadow-lg shadow-purple-500/5" 
+        : "bg-slate-50 border-slate-200 shadow-sm"
+    }`}>
+      <div className="flex items-center gap-3 justify-between mb-4">
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Avatar circle - larger */}
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-base shadow-lg shadow-blue-500/30 flex-shrink-0">
+            {user?.username?.substring(0, 2).toUpperCase() || "AI"}
+          </div>
+          <div className="min-w-0">
+            <p className={`text-sm font-semibold truncate ${theme === "dark" ? "text-white" : "text-slate-800"}`}>
+              {user?.username || "AI Companion"}
+            </p>
+            <p className={`text-[10px] truncate ${theme === "dark" ? "text-gray-400" : "text-slate-600"}`}>
+              {user?.email || `${user?.username || "companion"}@example.com`}
+            </p>
+          </div>
+        </div>
+        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" title="Online" />
+      </div>
+      
+      {/* Logout button - larger with better styling */}
+      <button
+        onClick={logout}
+        className={`w-full py-2.5 px-3 rounded-xl border font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer active:scale-95 ${
+          theme === "dark"
+            ? "border-red-500/30 hover:border-red-500/60 bg-red-500/15 hover:bg-red-500/25 text-red-400 hover:text-red-300 shadow-md shadow-red-500/10"
+            : "border-red-300 hover:border-red-400 bg-red-50 hover:bg-red-100 text-red-600"
+        }`}
+      >
+        <RiLogoutBoxLine size={18} />
+        <span>Logout</span>
+      </button>
+    </div>
+  );
+
+  // Mobile hamburger toggle bar (when sidebar is collapsed on mobile view)
   if (isMobile && isCollapsed) {
     return (
       <button
         onClick={() => setIsMobileSidebarOpen(true)}
-        className="
-          fixed
-          top-4
-          left-4
-          z-50
-          bg-blue-600
-          hover:bg-blue-700
-          text-white
-          p-3
-          rounded-lg
-          md:hidden
-        "
+        className="fixed top-4 left-4 z-50 bg-[#0B1120] border border-gray-800 text-white p-3 rounded-xl hover:bg-[#1E293B]"
         title="Open menu"
       >
-        <FaBars size={20} />
+        <FaBars size={18} />
       </button>
     );
   }
 
-  // Mobile overlay sidebar
+  // Mobile Slide-over Overlay Sidebar Drawer
   if (isMobile && isMobileSidebarOpen) {
     return (
-      <div className="fixed inset-0 z-40 md:hidden">
-        {/* Backdrop */}
+      <div className="fixed inset-0 z-50 md:hidden">
+        {/* Semi-transparent backdrop blur */}
         <div
-          className="absolute inset-0 bg-black bg-opacity-50"
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
           onClick={() => setIsMobileSidebarOpen(false)}
         />
 
-        {/* Sidebar */}
-        <div
-          className="
-            absolute
-            left-0
-            top-0
-            bottom-0
-            w-64
-            bg-[#0B1120]
-            border-r
-            border-gray-800
-            flex
-            flex-col
-            overflow-y-auto
-          "
-        >
-          {/* Close button */}
-          <button
-            onClick={() => setIsMobileSidebarOpen(false)}
-            className="
-              absolute
-              top-4
-              right-4
-              text-gray-400
-              hover:text-white
-              z-50
-            "
-          >
-            <FaTimes size={20} />
-          </button>
-
+        {/* Sidebar Drawer container */}
+        <div className={`absolute left-0 top-0 bottom-0 w-72 flex flex-col border-r shadow-2xl transition-all duration-300 ${
+          theme === "dark" ? "bg-[#0B1120] border-gray-800/80" : "bg-white border-slate-200"
+        }`}>
           {/* Header */}
-          <div className="p-4 border-b border-gray-800 mt-8">
-            <h1 className="text-2xl font-bold text-blue-400 text-center">
-              AI Chat
-            </h1>
-
+          <div className="p-4 border-b border-gray-800/40 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">✨</span>
+              <span className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-slate-900"}`}>AI Chat</span>
+            </div>
             <button
-              onClick={() => {
-                onNewChat();
-                setIsMobileSidebarOpen(false);
-              }}
-              className="
-                w-full
-                mt-4
-                bg-blue-600
-                hover:bg-blue-700
-                text-white
-                rounded-lg
-                py-2
-              "
+              onClick={() => setIsMobileSidebarOpen(false)}
+              className="p-1 text-gray-400 hover:text-white"
             >
-              + New Chat
+              <FaTimes size={18} />
             </button>
           </div>
 
-          {/* Content - scrollable */}
-          <div className="flex-1 overflow-y-auto p-2">
-            {/* Search */}
-            <div className="px-2 py-3">
-              <div className="relative">
-                <FaSearch
-                  className="absolute left-3 top-3 text-gray-500"
-                  size={14}
-                />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="
-                    w-full
-                    pl-10
-                    p-2
-                    rounded-lg
-                    bg-[#111827]
-                    border
-                    border-gray-700
-                    text-white
-                    outline-none
-                    text-sm
-                  "
-                />
-              </div>
-            </div>
+          {/* New Chat & Search */}
+          <div className="p-3 space-y-3">
+            <button
+              onClick={() => { onNewChat(); setIsMobileSidebarOpen(false); }}
+              className="w-full py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition active:scale-95 shadow-md flex items-center justify-center gap-3"
+            >
+              <FaComments size={16} />
+              <span>New Chat</span>
+            </button>
 
+            <div className="relative group">
+              <input
+                type="text"
+                placeholder="Search chats..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full pl-4 pr-10 py-2 rounded-xl text-xs outline-none border transition ${
+                  theme === "dark"
+                    ? "bg-[#111827]/40 border-gray-800 text-white placeholder-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+                    : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+                }`}
+              />
+              <FaSearch className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors ${theme === "dark" ? "text-gray-600 group-focus-within:text-blue-400" : "text-slate-400 group-focus-within:text-blue-500"}`} size={12} />
+            </div>
+          </div>
+
+          {/* Scrolling Conversations */}
+          <div className="flex-1 flex flex-col overflow-hidden px-2">
             {/* Pinned section */}
             {filteredPinned.length > 0 && (
-              <div className="px-2 py-3">
-                <h3 className="text-xs text-gray-400 px-3 py-2 font-semibold">
-                  📌 PINNED
+              <div className="flex flex-col min-h-0 pt-4">
+                <h3 className="text-sm text-gray-400 px-3 py-1 font-semibold tracking-wide uppercase">
+                  📌 PINNED CHATS
                 </h3>
-                {filteredPinned.map((c) => renderConversationItem(c, true))}
+                <div className="h-[1px] mt-1.5 mx-3 bg-gradient-to-r from-purple-500/0 via-purple-500/30 to-purple-500/0 flex-shrink-0" />
+                <div className="max-h-[120px] overflow-y-auto sidebar-scroll py-1 flex-shrink-0">
+                  {filteredPinned.map((c) => renderConversationItem(c, true))}
+                </div>
               </div>
             )}
 
             {/* Recent section */}
-            <div className="px-2 py-3">
-              <h3 className="text-xs text-gray-400 px-3 py-2 font-semibold">
-                RECENT CHATS
+            <div className="flex flex-col min-h-0 flex-1 pt-4">
+              <h3 className="text-sm text-gray-400 px-3 py-1 font-semibold tracking-wide uppercase">
+                🕒 RECENT CHATS
               </h3>
-              {filteredRecent.length > 0 ? (
-                filteredRecent.map((c) => renderConversationItem(c, false))
-              ) : (
-                <p className="text-xs text-gray-500 px-3 py-2">No chats yet</p>
-              )}
+              <div className="h-[1px] mt-1.5 mx-3 bg-gradient-to-r from-purple-500/0 via-purple-500/30 to-purple-500/0 flex-shrink-0" />
+              <div className="max-h-[200px] overflow-y-auto sidebar-scroll py-1 flex-1">
+                {filteredRecent.length > 0 ? (
+                  filteredRecent.map((c) => renderConversationItem(c, false))
+                ) : (
+                  <p className="text-xs text-gray-500 px-3 py-2 italic">No conversations</p>
+                )}
+              </div>
             </div>
 
             {/* Archived section */}
+            {archivedConversations.length > 0 && (
+              <div className="flex flex-col min-h-0 pt-4">
+                <h3 className="text-sm text-gray-400 px-3 py-1 font-semibold tracking-wide uppercase">
+                  📦 ARCHIVED CHATS
+                </h3>
+                <div className="h-[1px] mt-1.5 mx-3 bg-gradient-to-r from-purple-500/0 via-purple-500/30 to-purple-500/0 flex-shrink-0" />
+                <div className="max-h-[80px] overflow-y-auto sidebar-scroll py-1 flex-shrink-0">
+                  {filteredArchived.map((conversation) => {
+                    const id = conversation.id;
+                    const title = conversation.title || "Untitled Chat";
+                    const active = id === activeConversationId;
 
-{archivedConversations.length > 0 && (
-  <div className="px-2 py-3 border-t border-gray-700">
-
-    <h3
-      className="
-      text-xs
-      text-gray-400
-      px-3
-      py-2
-      font-semibold
-      "
-    >
-      📦 ARCHIVED ({archivedConversations.length})
-    </h3>
-
-    {filteredArchived.map((conversation) => {
-
-      const id = conversation.id;
-      const title = conversation.title;
-      const active = id === activeConversationId;
-
-      return(
-
-        <div
-          key={id}
-          onClick={() =>
-            handleSelectConversation(id)
-          }
-          className={`
-            group
-            flex
-            justify-between
-            items-center
-            p-3
-            rounded-lg
-            cursor-pointer
-            mb-2
-            transition
-            ${
-              active
-              ?
-              "bg-blue-700"
-              :
-              "hover:bg-[#1E293B]"
-            }
-          `}
-        >
-
-          <span
-            className="
-            truncate
-            text-sm
-            text-gray-300
-            flex-1
-            "
-          >
-            {title}
-          </span>
-
-          <div
-            className="
-            flex
-            gap-2
-            opacity-0
-            group-hover:opacity-100
-            transition
-            "
-          >
-
-            <button
-              onClick={(e)=>{
-
-                e.stopPropagation();
-
-                onRestoreConversation(id);
-
-              }}
-              className="
-              text-green-400
-              hover:text-green-300
-              "
-              title="Restore"
-            >
-              <FaUndo size={13}/>
-            </button>
-
-            <button
-              onClick={(e)=>{
-
-                e.stopPropagation();
-
-                onDeleteConversation(id);
-
-              }}
-              className="
-              text-red-400
-              hover:text-red-300
-              "
-              title="Delete permanently"
-            >
-              <FaTrash size={13}/>
-            </button>
-
+                    return (
+                      <div
+                        key={id}
+                        onClick={() => handleSelectConversation(id)}
+                        className={`group flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition select-none ${
+                          active 
+                            ? "bg-blue-600/90 text-white" 
+                            : "hover:bg-gray-800/50 text-gray-300"
+                        }`}
+                      >
+                        <span className="truncate text-xs flex-1 pr-2">{title}</span>
+                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition duration-150 flex-shrink-0">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onRestoreConversation(id); }}
+                            className="text-emerald-400 hover:text-emerald-300"
+                            title="Restore chat"
+                          >
+                            <FaUndo size={11} />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onDeleteConversation(id); }}
+                            className="text-red-400 hover:text-red-300"
+                            title="Delete permanently"
+                          >
+                            <FaTrash size={11} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
-        </div>
-
-      );
-
-    })}
-
-  </div>
-)}
-          </div>
-
-          {/* Footer */}
-          <div className="p-4 border-t border-gray-800">
-            <button
-              onClick={logout}
-              className="
-                w-full
-                bg-red-600
-                hover:bg-red-700
-                text-white
-                rounded-lg
-                py-2
-                text-sm
-              "
-            >
-              Logout
-            </button>
+          {/* Bottom Profile card */}
+          <div className="p-3 border-t border-gray-800/40">
+            {renderProfileCard()}
           </div>
         </div>
       </div>
@@ -530,263 +434,161 @@ archivedConversations
     return null;
   }
 
+  // Desktop Responsive Sidebar view
   return (
     <div
       ref={sidebarRef}
-      className="
-        h-screen
-        bg-[#0B1120]
-        border-r
-        border-gray-800
-        flex
-        flex-col
-        relative
-        transition-all
-        duration-300
-        hidden
-        md:flex
-      "
-      style={{
-        width: `${sidebarWidth}px`
-      }}
+      className={`h-screen border-r flex flex-col relative transition-all duration-300 hidden md:flex ${
+        theme === "dark" ? "bg-[#0B1120] border-gray-800/80" : "bg-white border-slate-200"
+      }`}
+      style={{ width: `${sidebarWidth}px` }}
     >
-      {/* Header */}
-      <div className="p-4 border-b border-gray-800">
-        <h1 className="text-2xl font-bold text-blue-400 text-center">
-          AI Chat
-        </h1>
+      {/* Upper Logo header with sparkle and collapse button */}
+      <div className="p-4 border-b border-gray-800/40 flex items-center justify-between select-none">
+        <div className="flex items-center gap-2.5">
+          <span className="text-2xl drop-shadow-[0_0_10px_rgba(56,189,248,0.5)]">✨</span>
+          <h1 className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-slate-900"}`}>
+            AI Chat
+          </h1>
+        </div>
+        <button
+          onClick={handleToggleCollapse}
+          className={`p-2 rounded-lg transition-all duration-300 ${
+            theme === "dark"
+              ? "hover:bg-gray-800/60 text-gray-400 hover:text-white"
+              : "hover:bg-slate-200 text-slate-600 hover:text-slate-900"
+          }`}
+          title="Collapse sidebar"
+        >
+          <FaBars size={16} />
+        </button>
+      </div>
 
+      {/* Control Buttons & Search bar */}
+      <div className="p-4 space-y-3">
+        {/* New Chat button with chat bubble icon */}
         <button
           onClick={onNewChat}
-          className="
-            w-full
-            mt-4
-            bg-blue-600
-            hover:bg-blue-700
-            text-white
-            rounded-lg
-            py-2
-          "
+          className="w-full py-2.5 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 shadow-lg shadow-blue-500/20 active:scale-95 transition-all duration-150 flex items-center justify-center gap-3 cursor-pointer"
         >
-          + New Chat
+          <FaComments size={16} />
+          <span>New Chat</span>
         </button>
 
-        <div className="relative mt-3">
-          <FaSearch
-            className="absolute left-3 top-3 text-gray-500"
-            size={14}
-          />
-
+        {/* Search Input bar - icon on right */}
+        <div className="relative group">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search chats..."
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-            }}
-            className="
-              w-full
-              pl-10
-              p-2
-              rounded-lg
-              bg-[#111827]
-              border
-              border-gray-700
-              text-white
-              outline-none
-              text-sm
-            "
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={`w-full pl-4 pr-10 py-2.5 rounded-xl text-xs outline-none border transition-all duration-200 ${
+              theme === "dark"
+                ? "bg-[#111827]/40 border-gray-800 text-white placeholder-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg focus:shadow-blue-500/10" 
+                : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+            }`}
           />
+          <FaSearch className={`absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${theme === "dark" ? "text-gray-600 group-focus-within:text-blue-400" : "text-slate-400 group-focus-within:text-blue-500"}`} size={12} />
         </div>
       </div>
 
-      {/* Main content area */}
-      <div className="flex-1 overflow-y-auto p-2">
+      {/* Main scrolling layout area with improved spacing */}
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Pinned section */}
         {filteredPinned.length > 0 && (
-          <div>
-            <h3 className="text-xs text-gray-400 px-3 py-2 font-semibold">
-              📌 PINNED CHATS
+          <div className="flex flex-col min-h-0 pt-5">
+            <h3 className="text-sm font-semibold text-gray-400 px-3 py-1.5 tracking-wide uppercase flex items-center gap-2 select-none flex-shrink-0">
+              <span>📌</span>
+              <span>PINNED CHATS</span>
             </h3>
-
-            {filteredPinned.map((c) => renderConversationItem(c, true))}
-
-            <hr className="my-2 border-gray-700" />
+            <div className="h-[1px] mt-2 mx-3 bg-gradient-to-r from-purple-500/0 via-purple-500/30 to-purple-500/0 flex-shrink-0" />
+            <div className="max-h-[120px] overflow-y-auto sidebar-scroll px-2 py-1 flex-shrink-0">
+              {filteredPinned.map((c) => renderConversationItem(c, true))}
+            </div>
           </div>
         )}
 
-        {/* ARCHIVED */}
+        {/* Recent section */}
+        <div className="flex flex-col min-h-0 flex-1 pt-5">
+          <h3 className="text-sm font-semibold text-gray-400 px-3 py-1.5 tracking-wide uppercase flex items-center gap-2 select-none flex-shrink-0">
+            <span>🕒</span>
+            <span>RECENT CHATS</span>
+          </h3>
+          <div className="h-[1px] mt-2 mx-3 bg-gradient-to-r from-purple-500/0 via-purple-500/30 to-purple-500/0 flex-shrink-0" />
+          <div className="max-h-[320px] overflow-y-auto sidebar-scroll px-2 py-1 flex-1">
+            {filteredRecent.length > 0 ? (
+              filteredRecent.map((c) => renderConversationItem(c, false))
+            ) : (
+              <p className="text-xs text-gray-500 px-3 py-2 italic select-none">No active conversations</p>
+            )}
+          </div>
+        </div>
 
-{archivedConversations.length > 0 && (
+        {/* Archived section */}
+        {archivedConversations.length > 0 && (
+          <div className="flex flex-col min-h-0 pt-5">
+            <h3 className="text-sm font-semibold text-gray-400 px-3 py-1.5 tracking-wide uppercase flex items-center gap-2 select-none flex-shrink-0">
+              <span>📦</span>
+              <span>ARCHIVED CHATS</span>
+            </h3>
+            <div className="h-[1px] mt-2 mx-3 bg-gradient-to-r from-purple-500/0 via-purple-500/30 to-purple-500/0 flex-shrink-0" />
+            <div className="max-h-[100px] overflow-y-auto sidebar-scroll px-2 py-1 flex-shrink-0">
+              {filteredArchived.map((conversation) => {
+                const id = conversation.id;
+                const title = conversation.title || "Untitled Chat";
+                const active = id === activeConversationId;
 
-<div className="mt-4">
+                return (
+                  <div
+                    key={id}
+                    onClick={() => handleSelectConversation(id)}
+                    className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer mb-1.5 transition-all duration-200 select-none ${
+                      active 
+                        ? "bg-gradient-to-r from-blue-600/90 to-purple-600/90 text-white shadow-md shadow-blue-500/10 border-l-4 border-blue-400" 
+                        : theme === "dark" 
+                          ? "hover:bg-gray-800/60 border-l-4 border-transparent text-gray-200" 
+                          : "hover:bg-slate-200/80 border-l-4 border-transparent text-slate-700"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className="text-sm text-gray-400 group-hover:text-white flex-shrink-0">💬</span>
+                      <span className="truncate text-sm font-medium flex-1 pr-2">{title}</span>
+                    </div>
 
-<hr className="my-2 border-gray-700"/>
-
-<button
-onClick={() =>
-onToggleShowArchivedChats?.(
-!showArchivedChats
-)
-}
-className="
-w-full
-text-left
-text-xs
-text-gray-400
-px-3
-py-2
-font-semibold
-hover:text-gray-300
-transition
-"
->
-
-📦 ARCHIVED
-({archivedConversations.length})
-
-</button>
-
-
-{showArchivedChats && (
-
-<div className="mt-2">
-
-{filteredArchived.map((conversation)=>{
-
-const id=conversation.id;
-const title=conversation.title;
-const active=id===activeConversationId;
-
-return(
-
-<div
-key={id}
-onClick={() =>
-handleSelectConversation(id)
-}
-className={`
-group
-flex
-justify-between
-items-center
-p-3
-rounded-lg
-cursor-pointer
-mb-2
-transition
-${active
-? "bg-blue-700"
-: "hover:bg-[#1E293B]"
-}
-`}
->
-
-<span
-className="
-truncate
-text-sm
-text-gray-300
-flex-1
-"
->
-{title}
-</span>
-
-<div
-className="
-flex
-gap-2
-opacity-0
-group-hover:opacity-100
-transition
-"
->
-
-<button
-onClick={(e)=>{
-e.stopPropagation();
-onRestoreConversation(id);
-}}
-className="
-text-green-400
-hover:text-green-300
-"
->
-<FaUndo size={13}/>
-</button>
-
-<button
-onClick={(e)=>{
-e.stopPropagation();
-onDeleteConversation(id);
-}}
-className="
-text-red-400
-hover:text-red-300
-"
->
-<FaTrash size={13}/>
-</button>
-
-</div>
-
-</div>
-
-)
-
-})}
-
-</div>
-
-)}
-
-</div>
-
-)}
-
-        <h3 className="text-xs text-gray-400 px-3 py-2 font-semibold">
-          RECENT CHATS
-        </h3>
-        {filteredRecent.length > 0 ? (
-          filteredRecent.map((c) => renderConversationItem(c, false))
-        ) : (
-          <p className="text-xs text-gray-500 px-3 py-2">No chats yet</p>
+                    <div className="flex gap-2.5 opacity-0 group-hover:opacity-100 transition duration-150 flex-shrink-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onRestoreConversation(id); }}
+                        className="text-gray-400 hover:text-emerald-400"
+                        title="Restore chat"
+                      >
+                        <FaUndo size={12} />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onDeleteConversation(id); }}
+                        className="text-gray-400 hover:text-red-400"
+                        title="Delete permanently"
+                      >
+                        <FaTrash size={12} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
       </div>
-      
-      
 
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-800">
-        <button
-          onClick={logout}
-          className="
-            w-full
-            bg-red-600
-            hover:bg-red-700
-            text-white
-            rounded-lg
-            py-2
-          "
-        >
-          Logout
-        </button>
+      {/* Desktop Profile card fixed at bottom with better spacing */}
+      <div className="p-3 border-t border-gray-800/40">
+        {renderProfileCard()}
       </div>
 
       {/* Resize handle (desktop only) */}
       <div
         onMouseDown={() => setIsResizing(true)}
-        className="
-          absolute
-          right-0
-          top-0
-          w-1
-          h-full
-          cursor-col-resize
-          hover:bg-blue-500
-        "
-      ></div>
+        className="absolute right-0 top-0 w-1.5 h-full cursor-col-resize hover:bg-gradient-to-b hover:from-blue-500 hover:to-purple-500 transition-colors z-40"
+      />
     </div>
   );
 }
