@@ -80,6 +80,65 @@ const GithubIcon = () => (
   </svg>
 );
 
+const LogoSVG = () => (
+  <svg viewBox="0 0 40 40" className="w-8 h-8 text-blue-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.6)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="20" cy="20" r="18" stroke="url(#logoGlow)" strokeWidth="2" fill="#0c1626" />
+    <rect x="10" y="14" width="20" height="15" rx="6" fill="#1e2d4f" stroke="#38bdf8" strokeWidth="1.5" />
+    <rect x="13" y="17" width="14" height="9" rx="3.5" fill="#030b1f" />
+    <circle cx="17" cy="21.5" r="1.5" fill="#38bdf8" />
+    <circle cx="23" cy="21.5" r="1.5" fill="#38bdf8" />
+    <path d="M19 23.5h2" stroke="#38bdf8" strokeWidth="1" strokeLinecap="round" />
+    <path d="M20 14v-3" stroke="#8a9ab5" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="20" cy="10" r="1.5" fill="#38bdf8" />
+    <defs>
+      <linearGradient id="logoGlow" x1="0" y1="0" x2="40" y2="40">
+        <stop offset="0%" stopColor="#38bdf8" />
+        <stop offset="100%" stopColor="#7c5cff" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+const ChatBubbleGlow = ({ className, delay }) => (
+  <div className={`absolute z-20 p-2 rounded-full bg-gradient-to-br from-[#7c5cff] to-[#4f7cff] text-white shadow-lg shadow-purple-500/25 animate-float flex items-center justify-center w-10 h-10 border border-white/10 select-none ${className}`} style={{ animationDelay: delay }}>
+    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 11a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2z"/>
+    </svg>
+  </div>
+);
+
+const SmartConvIcon = () => (
+  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-md shadow-blue-500/5 flex-shrink-0 transition-transform duration-300 hover:scale-105">
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+    </svg>
+  </div>
+);
+
+const FileAnalysisIcon = () => (
+  <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shadow-md shadow-purple-500/5 flex-shrink-0 transition-transform duration-300 hover:scale-105">
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  </div>
+);
+
+const ChatHistoryIcon = () => (
+  <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shadow-md shadow-cyan-500/5 flex-shrink-0 transition-transform duration-300 hover:scale-105">
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    </svg>
+  </div>
+);
+
+const SecureIcon = () => (
+  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-md shadow-indigo-500/5 flex-shrink-0 transition-transform duration-300 hover:scale-105">
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+    </svg>
+  </div>
+);
+
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -175,7 +234,9 @@ export default function Login() {
 
       {/* Outer Wrapper Panel */}
       <div className={`w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 rounded-3xl overflow-hidden border transition-all duration-300 shadow-2xl relative z-10 ${
-        theme === "dark" ? "border-gray-800/80 bg-[#060818]/60 backdrop-blur-xl" : "border-slate-200 bg-white/85 backdrop-blur-xl"
+        theme === "dark" 
+          ? "border-gray-800/80 bg-[#060818]/60 backdrop-blur-xl shadow-[0_0_50px_rgba(79,124,255,0.1)]" 
+          : "border-slate-200 bg-white/85 backdrop-blur-xl"
       }`}>
         
         {/* Top-right Controls panel (sun/moon light-dark control toggle) */}
@@ -194,14 +255,14 @@ export default function Login() {
           </button>
         </div>
 
-        {/* ================= LEFT SIDE: CENTERING ILLUSTRATION & FEATURES ================= */}
-        <div className={`p-8 md:p-12 flex flex-col justify-between border-r transition-all duration-300 relative overflow-hidden ${
+        {/* ================= LEFT SIDE: DESKTOP ONLY ILLUSTRATION & FEATURES ================= */}
+        <div className={`hidden md:flex p-10 lg:p-12 flex-col justify-between border-r transition-all duration-300 relative overflow-hidden ${
           theme === "dark" 
             ? "bg-gradient-to-br from-[#0c0f24] to-[#040615] border-gray-800/60" 
             : "bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200"
         }`}>
           
-          {/* Subtle floating particles (only visible in dark mode for aesthetic effect) */}
+          {/* Subtle floating particles in dark mode */}
           {theme === "dark" && (
             <div className="absolute inset-0 pointer-events-none opacity-40">
               <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400 rounded-full animate-ping" />
@@ -210,82 +271,84 @@ export default function Login() {
             </div>
           )}
 
-          {/* Upper Title */}
-          <div className="flex items-center gap-3 justify-center w-full">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-500/20">
-              💬
-            </div>
+          {/* Upper Title Logo Bar */}
+          <div className="flex items-center gap-3 w-full">
+            <LogoSVG />
             <span className={`text-xl font-bold tracking-wide ${theme === "dark" ? "text-white" : "text-slate-900"}`}>AI Chat</span>
           </div>
 
-          {/* Centered Robot & Welcome Back block */}
-          <div className="flex-1 flex flex-col justify-center items-center my-6 space-y-6">
+          {/* Centered Desktop Layout Section */}
+          <div className="flex-1 flex flex-col justify-center my-auto w-full">
             
-            {/* Robot is centered horizontally and placed above Welcome Back */}
-            <div className="flex items-center justify-center w-full">
-              <RobotSVG />
-            </div>
-            
-            {/* Centered Welcome Back Text */}
-            <div className="text-center">
-              <h2 className={`text-3xl font-extrabold tracking-tight transition-colors duration-300 ${
+            {/* Title and description block */}
+            <div className="text-left mb-8">
+              <h2 className={`text-4xl font-extrabold tracking-tight transition-colors duration-300 ${
                 theme === "dark" ? "text-white" : "text-slate-900"
               }`}>
-                Welcome <span className="gradient-text">Back</span> 👋
+                Welcome <span className="text-[#6c8cff] bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Back</span> 👋
               </h2>
-              <p className={`mt-2 max-w-sm mx-auto text-sm leading-relaxed transition-colors duration-300 ${
+              <p className={`mt-2 text-sm leading-relaxed transition-colors duration-300 ${
                 theme === "dark" ? "text-gray-400" : "text-slate-500"
               }`}>
                 Login to continue your conversations with AI Chat Assistant
               </p>
             </div>
 
-            {/* Centered Feature Checklist block */}
-            <div className="space-y-3.5 max-w-xs w-full text-left mt-2">
-              <div className="flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${
-                  theme === "dark" ? "bg-blue-500/10 border border-blue-500/30 text-blue-400" : "bg-blue-100 border border-blue-200 text-blue-600"
-                }`}>✓</div>
-                <div>
-                  <h4 className={`text-xs font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Smart Conversations</h4>
-                  <p className={`text-[10px] ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Get intelligent & accurate responses</p>
+            {/* Checklist & Robot side-by-side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center w-full">
+              
+              {/* Feature list */}
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <SmartConvIcon />
+                  <div>
+                    <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Smart Conversations</h4>
+                    <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Get intelligent & accurate responses</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <FileAnalysisIcon />
+                  <div>
+                    <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>File Analysis</h4>
+                    <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Upload & analyze documents, images & more</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <ChatHistoryIcon />
+                  <div>
+                    <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Chat History</h4>
+                    <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Access your conversations anywhere</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <SecureIcon />
+                  <div>
+                    <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Secure & Private</h4>
+                    <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Your data is encrypted and protected</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${
-                  theme === "dark" ? "bg-blue-500/10 border border-blue-500/30 text-blue-400" : "bg-blue-100 border border-blue-200 text-blue-600"
-                }`}>✓</div>
-                <div>
-                  <h4 className={`text-xs font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>File Analysis</h4>
-                  <p className={`text-[10px] ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Upload & analyze documents, images & more</p>
-                </div>
+
+              {/* Robot with floating chat bubbles */}
+              <div className="relative w-full flex items-center justify-center h-72">
+                <ChatBubbleGlow className="top-8 left-4" delay="0s" />
+                <ChatBubbleGlow className="top-16 right-4" delay="1s" />
+                <ChatBubbleGlow className="bottom-12 right-2 w-8 h-8" delay="2s" />
+                <RobotSVG />
               </div>
-              <div className="flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${
-                  theme === "dark" ? "bg-blue-500/10 border border-blue-500/30 text-blue-400" : "bg-blue-100 border border-blue-200 text-blue-600"
-                }`}>✓</div>
-                <div>
-                  <h4 className={`text-xs font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Chat History</h4>
-                  <p className={`text-[10px] ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Access your conversations anywhere</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${
-                  theme === "dark" ? "bg-blue-500/10 border border-blue-500/30 text-blue-400" : "bg-blue-100 border border-blue-200 text-blue-600"
-                }`}>✓</div>
-                <div>
-                  <h4 className={`text-xs font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Secure & Private</h4>
-                  <p className={`text-[10px] ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Your data is encrypted and protected</p>
-                </div>
-              </div>
+
             </div>
+
           </div>
 
-          {/* Quote Footer */}
-          <div className="mt-4 pt-4 border-t border-gray-800/40 text-center">
-            <p className={`text-xs italic ${theme === "dark" ? "text-gray-500" : "text-slate-400"}`}>
+          {/* Quote Footer Container */}
+          <div className="mt-8 pt-4">
+            <div className={`glass px-5 py-2.5 rounded-2xl text-xs inline-block max-w-xs text-gray-400 border border-gray-800/40 shadow-md backdrop-blur-sm`}>
               "AI is not just the future, it's the present."
-            </p>
+            </div>
           </div>
         </div>
 
@@ -295,8 +358,37 @@ export default function Login() {
         }`}>
           <div className="w-full max-w-sm mx-auto">
             
-            {/* Header Text */}
-            <div className="mb-8">
+            {/* Mobile-only Header & Illustration (hidden on Desktop) */}
+            <div className="md:hidden flex flex-col items-center w-full mb-6">
+              {/* Mobile Header Bar */}
+              <div className="w-full flex items-center justify-between mb-8 select-none">
+                <div className="flex items-center gap-2.5">
+                  <LogoSVG />
+                  <span className="text-lg font-bold text-white tracking-wide">AI Chat</span>
+                </div>
+              </div>
+
+              {/* Mobile Centered Robot with bubbles */}
+              <div className="relative w-60 h-60 flex items-center justify-center mb-6">
+                <ChatBubbleGlow className="top-6 left-2" delay="0s" />
+                <ChatBubbleGlow className="top-14 right-4" delay="1s" />
+                <ChatBubbleGlow className="bottom-10 right-2 w-8 h-8" delay="2s" />
+                <RobotSVG />
+              </div>
+
+              {/* Mobile Welcome Text */}
+              <div className="text-center mb-2">
+                <h2 className="text-3xl font-extrabold tracking-tight text-white">
+                  Welcome <span className="text-[#6c8cff] bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Back</span> 👋
+                </h2>
+                <p className="mt-2 text-xs text-gray-400 max-w-xs mx-auto">
+                  Login to continue your conversations with AI Chat Assistant
+                </p>
+              </div>
+            </div>
+
+            {/* Desktop-only card header */}
+            <div className="hidden md:block mb-8">
               <h3 className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-slate-900"}`}>Welcome Back</h3>
               <p className={`text-xs mt-1.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Login to your account</p>
             </div>
@@ -316,13 +408,17 @@ export default function Login() {
               <div>
                 <label className={`block text-xs font-semibold mb-2 ${theme === "dark" ? "text-gray-300" : "text-slate-700"}`}>Email</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </span>
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter your email"
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl text-sm outline-none transition duration-200 ${
+                    className={`w-full pl-12 pr-4 py-3 rounded-xl text-sm outline-none transition duration-200 ${
                       theme === "dark"
                         ? "bg-[#0b0e24] border border-gray-800 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
                         : "bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
@@ -336,13 +432,17 @@ export default function Login() {
               <div>
                 <label className={`block text-xs font-semibold mb-2 ${theme === "dark" ? "text-gray-300" : "text-slate-700"}`}>Password</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </span>
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className={`w-full pl-11 pr-12 py-3 rounded-xl text-sm outline-none transition duration-200 ${
+                    className={`w-full pl-12 pr-12 py-3 rounded-xl text-sm outline-none transition duration-200 ${
                       theme === "dark"
                         ? "bg-[#0b0e24] border border-gray-800 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
                         : "bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
@@ -352,9 +452,18 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition cursor-pointer"
                   >
-                    {showPassword ? "🙈" : "👁️"}
+                    {showPassword ? (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
@@ -398,31 +507,57 @@ export default function Login() {
               <div className={`flex-1 h-[1px] ${theme === "dark" ? "bg-gray-800/80" : "bg-slate-200"}`} />
             </div>
 
-            {/* Social Logins */}
-            <div className="grid grid-cols-2 sm:grid-cols-1 gap-3">
+            {/* Social Logins - Desktop stacked version */}
+            <div className="hidden md:flex flex-col gap-3">
               <button
                 type="button"
                 onClick={() => alert("Google sign in is currently in mockup mode.")}
-                className={`py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2.5 cursor-pointer border transition duration-300 ${
+                className={`py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2.5 cursor-pointer border transition duration-300 w-full ${
                   theme === "dark"
                     ? "social-button text-gray-200"
                     : "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700 hover:border-slate-300"
                 }`}
               >
                 <GoogleIcon />
-                <span className="hidden sm:inline">Continue with Google</span>
+                <span>Continue with Google</span>
               </button>
               <button
                 type="button"
                 onClick={() => alert("GitHub sign in is currently in mockup mode.")}
-                className={`py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2.5 cursor-pointer border transition duration-300 ${
+                className={`py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2.5 cursor-pointer border transition duration-300 w-full ${
                   theme === "dark"
                     ? "social-button text-gray-200"
                     : "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700 hover:border-slate-300"
                 }`}
               >
                 <GithubIcon />
-                <span className="hidden sm:inline">Continue with GitHub</span>
+                <span>Continue with GitHub</span>
+              </button>
+            </div>
+
+            {/* Social Logins - Mobile side-by-side icons version */}
+            <div className="flex md:hidden grid grid-cols-2 gap-3.5 w-full">
+              <button
+                type="button"
+                onClick={() => alert("Google sign in is currently in mockup mode.")}
+                className={`py-3 rounded-xl text-sm font-semibold flex items-center justify-center cursor-pointer border transition duration-300 ${
+                  theme === "dark"
+                    ? "social-button text-gray-200"
+                    : "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700 hover:border-slate-300"
+                }`}
+              >
+                <GoogleIcon />
+              </button>
+              <button
+                type="button"
+                onClick={() => alert("GitHub sign in is currently in mockup mode.")}
+                className={`py-3 rounded-xl text-sm font-semibold flex items-center justify-center cursor-pointer border transition duration-300 ${
+                  theme === "dark"
+                    ? "social-button text-gray-200"
+                    : "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700 hover:border-slate-300"
+                }`}
+              >
+                <GithubIcon />
               </button>
             </div>
 

@@ -1,0 +1,11 @@
+{
+  "totalTests": 52,
+  "passedTests": 34,
+  "failedTests": 18,
+  "warnings": 0,
+  "consoleErrors": [],
+  "networkFailures": [
+    "http://127.0.0.1:8000/api/auth/login/ (net::ERR_ABORTED)"
+  ],
+  "scorePercent": "65.4"
+}

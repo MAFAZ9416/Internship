@@ -408,13 +408,16 @@ export default function ChatInput({ onSend }) {
           <FaMicrophone size={14} className={isListening ? "text-red-500 animate-pulse" : "text-gray-400"} />
         </button>
 
-        {/* Circular Send button */}
+        {/* Circular Send button with high-fidelity paper airplane SVG */}
         <button
           type="submit"
           className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-white hover:scale-105 active:scale-95 transition-all duration-100 flex items-center justify-center flex-shrink-0 cursor-pointer shadow-md shadow-blue-500/15"
           title="Send message to AI"
         >
-          ➤
+          <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
         </button>
 
       </form>

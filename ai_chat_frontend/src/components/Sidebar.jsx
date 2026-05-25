@@ -11,7 +11,8 @@ import {
   FaStar,
   FaBars,
   FaTimes,
-  FaComments
+  FaComments,
+  FaEllipsisH
 } from "react-icons/fa";
 import { RiLogoutBoxLine } from "react-icons/ri";
 
@@ -238,39 +239,44 @@ export default function Sidebar({
 
   // Profile Card Component placed inside Sidebar
   const renderProfileCard = () => (
-    <div className={`p-5 mx-2 rounded-2xl border transition-all duration-300 backdrop-blur-sm ${
-      theme === "dark" 
-        ? "bg-[#0d1a2f]/60 border-purple-500/20 hover:border-purple-500/40 shadow-lg shadow-purple-500/5" 
-        : "bg-slate-50 border-slate-200 shadow-sm"
-    }`}>
-      <div className="flex items-center gap-3 justify-between mb-4">
-        <div className="flex items-center gap-3 min-w-0">
-          {/* Avatar circle - larger */}
-          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-base shadow-lg shadow-blue-500/30 flex-shrink-0">
-            {user?.username?.substring(0, 2).toUpperCase() || "AI"}
+    <div className="space-y-3">
+      {/* Profile Details Card */}
+      <div className={`p-4 rounded-2xl border transition-all duration-300 backdrop-blur-sm ${
+        theme === "dark" 
+          ? "bg-[#0d1a2f]/40 border-gray-800/80 hover:border-gray-700/60" 
+          : "bg-slate-50 border-slate-200 shadow-sm"
+      }`}>
+        <div className="flex items-center gap-3 justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Avatar circle */}
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
+              {user?.username?.substring(0, 2).toUpperCase() || "MA"}
+            </div>
+            <div className="min-w-0">
+              <p className={`text-xs font-semibold truncate ${theme === "dark" ? "text-white" : "text-slate-800"}`}>
+                {user?.username || "Mafaz Ahmad"}
+              </p>
+              <p className={`text-[9px] truncate ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>
+                {user?.email || "mafazahmad@example.com"}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className={`text-sm font-semibold truncate ${theme === "dark" ? "text-white" : "text-slate-800"}`}>
-              {user?.username || "AI Companion"}
-            </p>
-            <p className={`text-[10px] truncate ${theme === "dark" ? "text-gray-400" : "text-slate-600"}`}>
-              {user?.email || `${user?.username || "companion"}@example.com`}
-            </p>
-          </div>
+          <button className="text-gray-500 hover:text-white transition p-1">
+            <FaEllipsisH size={12} />
+          </button>
         </div>
-        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" title="Online" />
       </div>
       
-      {/* Logout button - larger with better styling */}
+      {/* Logout pill at the very bottom */}
       <button
         onClick={logout}
-        className={`w-full py-2.5 px-3 rounded-xl border font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer active:scale-95 ${
+        className={`w-full py-2 px-3 rounded-xl border font-semibold text-xs transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
           theme === "dark"
-            ? "border-red-500/30 hover:border-red-500/60 bg-red-500/15 hover:bg-red-500/25 text-red-400 hover:text-red-300 shadow-md shadow-red-500/10"
-            : "border-red-300 hover:border-red-400 bg-red-50 hover:bg-red-100 text-red-600"
+            ? "border-red-500/20 hover:border-red-500/40 bg-red-500/5 hover:bg-red-500/10 text-red-400"
+            : "border-red-200 hover:border-red-300 bg-red-50/50 hover:bg-red-50 text-red-600"
         }`}
       >
-        <RiLogoutBoxLine size={18} />
+        <RiLogoutBoxLine size={14} />
         <span>Logout</span>
       </button>
     </div>
@@ -306,7 +312,9 @@ export default function Sidebar({
           {/* Header */}
           <div className="p-4 border-b border-gray-800/40 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xl">✨</span>
+              <svg viewBox="0 0 24 24" className="w-5 h-5 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)] fill-current" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2l2.4 7.2 7.2 2.4-7.2 2.4-2.4 7.2-2.4-7.2-7.2-2.4 7.2-2.4z"/>
+              </svg>
               <span className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-slate-900"}`}>AI Chat</span>
             </div>
             <button
@@ -321,25 +329,30 @@ export default function Sidebar({
           <div className="p-3 space-y-3">
             <button
               onClick={() => { onNewChat(); setIsMobileSidebarOpen(false); }}
-              className="w-full py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition active:scale-95 shadow-md flex items-center justify-center gap-3"
+              className="w-full py-2.5 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-95 shadow-md shadow-blue-500/20 active:scale-95 transition-all duration-150 flex items-center justify-between cursor-pointer"
             >
-              <FaComments size={16} />
-              <span>New Chat</span>
+              <div className="flex items-center gap-2">
+                <span className="text-base font-black">+</span>
+                <span className="text-sm font-semibold">New Chat</span>
+              </div>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-white/10 text-white/50 border border-white/10 font-normal">⌘K</span>
             </button>
 
             <div className="relative group">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors">
+                <FaSearch size={12} />
+              </span>
               <input
                 type="text"
-                placeholder="Search chats..."
+                placeholder="Search chats"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full pl-4 pr-10 py-2 rounded-xl text-xs outline-none border transition ${
+                className={`w-full pl-9 pr-4 py-2 rounded-xl text-xs outline-none border transition ${
                   theme === "dark"
                     ? "bg-[#111827]/40 border-gray-800 text-white placeholder-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
                     : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
                 }`}
               />
-              <FaSearch className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors ${theme === "dark" ? "text-gray-600 group-focus-within:text-blue-400" : "text-slate-400 group-focus-within:text-blue-500"}`} size={12} />
             </div>
           </div>
 
@@ -446,7 +459,9 @@ export default function Sidebar({
       {/* Upper Logo header with sparkle and collapse button */}
       <div className="p-4 border-b border-gray-800/40 flex items-center justify-between select-none">
         <div className="flex items-center gap-2.5">
-          <span className="text-2xl drop-shadow-[0_0_10px_rgba(56,189,248,0.5)]">✨</span>
+          <svg viewBox="0 0 24 24" className="w-5 h-5 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)] fill-current" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2l2.4 7.2 7.2 2.4-7.2 2.4-2.4 7.2-2.4-7.2-7.2-2.4 7.2-2.4z"/>
+          </svg>
           <h1 className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-slate-900"}`}>
             AI Chat
           </h1>
@@ -466,29 +481,34 @@ export default function Sidebar({
 
       {/* Control Buttons & Search bar */}
       <div className="p-4 space-y-3">
-        {/* New Chat button with chat bubble icon */}
+        {/* New Chat button with gradient, + icon, and ⌘K */}
         <button
           onClick={onNewChat}
-          className="w-full py-2.5 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 shadow-lg shadow-blue-500/20 active:scale-95 transition-all duration-150 flex items-center justify-center gap-3 cursor-pointer"
+          className="w-full py-2.5 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-95 shadow-md shadow-blue-500/20 active:scale-95 transition-all duration-150 flex items-center justify-between cursor-pointer"
         >
-          <FaComments size={16} />
-          <span>New Chat</span>
+          <div className="flex items-center gap-2">
+            <span className="text-base font-black">+</span>
+            <span className="text-sm font-semibold">New Chat</span>
+          </div>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-white/10 text-white/50 border border-white/10 font-normal">⌘K</span>
         </button>
 
-        {/* Search Input bar - icon on right */}
+        {/* Search Input bar - icon on left */}
         <div className="relative group">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200">
+            <FaSearch size={12} />
+          </span>
           <input
             type="text"
-            placeholder="Search chats..."
+            placeholder="Search chats"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full pl-4 pr-10 py-2.5 rounded-xl text-xs outline-none border transition-all duration-200 ${
+            className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-xs outline-none border transition-all duration-200 ${
               theme === "dark"
                 ? "bg-[#111827]/40 border-gray-800 text-white placeholder-gray-500 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg focus:shadow-blue-500/10" 
                 : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
             }`}
           />
-          <FaSearch className={`absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${theme === "dark" ? "text-gray-600 group-focus-within:text-blue-400" : "text-slate-400 group-focus-within:text-blue-500"}`} size={12} />
         </div>
       </div>
 

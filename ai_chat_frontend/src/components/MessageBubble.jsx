@@ -3,15 +3,15 @@ import Toast from "./Toast";
 
 // Inline Bot Avatar
 const BotAvatar = () => (
-  <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 select-none animate-pulse flex-shrink-0">
+  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 select-none animate-pulse flex-shrink-0 border border-blue-400/20">
     🤖
   </div>
 );
 
-// Inline User Avatar
+// Inline User Avatar - premium mockup face image
 const UserAvatar = () => (
-  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md flex-shrink-0 select-none">
-    👤
+  <div className="w-9 h-9 rounded-full border border-purple-500/30 overflow-hidden shadow-md flex-shrink-0 select-none">
+    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80" alt="User" className="w-full h-full object-cover" />
   </div>
 );
 
@@ -92,10 +92,10 @@ const formatTime = (dateVal) => {
             isEditing 
               ? "bg-[#0b0e24] border border-gray-800" 
               : isUser
-                ? "bg-gradient-to-br from-blue-600 to-[#7c5cff] text-white rounded-tr-none border border-blue-500/20"
+                ? "bg-[#25235c] border border-[#3e3b8a] text-white rounded-tr-none shadow-[0_0_15px_rgba(124,92,255,0.05)]"
                 : theme === "dark"
-                  ? "bg-[#0d1a2f]/80 border-l-4 border-l-cyan-400 border border-cyan-400/10 text-gray-200 drop-shadow-[0_0_8px_rgba(34,211,238,0.03)]"
-                  : "bg-white border-l-4 border-l-cyan-500 border border-slate-200 text-slate-800 shadow-sm"
+                  ? "bg-[#0d1a2f] border border-[#1a2d4f] text-gray-200 drop-shadow-[0_0_8px_rgba(34,211,238,0.02)]"
+                  : "bg-white border border-slate-200 text-slate-800 shadow-sm"
           }`}
         >
           {isEditing ? (

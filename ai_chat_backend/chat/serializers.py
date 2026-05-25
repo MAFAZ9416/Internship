@@ -27,8 +27,7 @@ class UploadedFileSerializer(serializers.ModelSerializer):
             "file_name",
             "file_type",
             "file_size",
-            "file_size_display",
-            "uploaded_at"
+            "file_size_display"
 
         ]
 

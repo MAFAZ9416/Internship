@@ -64,7 +64,7 @@ const RobotSVG = () => (
 );
 
 const GoogleIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
@@ -73,8 +73,75 @@ const GoogleIcon = () => (
 );
 
 const GithubIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
     <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.577.688.479C19.138 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+  </svg>
+);
+
+const LogoSVG = () => (
+  <svg viewBox="0 0 40 40" className="w-8 h-8 text-blue-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.6)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="20" cy="20" r="18" stroke="url(#logoGlow)" strokeWidth="2" fill="#0c1626" />
+    <rect x="10" y="14" width="20" height="15" rx="6" fill="#1e2d4f" stroke="#38bdf8" strokeWidth="1.5" />
+    <rect x="13" y="17" width="14" height="9" rx="3.5" fill="#030b1f" />
+    <circle cx="17" cy="21.5" r="1.5" fill="#38bdf8" />
+    <circle cx="23" cy="21.5" r="1.5" fill="#38bdf8" />
+    <path d="M19 23.5h2" stroke="#38bdf8" strokeWidth="1" strokeLinecap="round" />
+    <path d="M20 14v-3" stroke="#8a9ab5" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="20" cy="10" r="1.5" fill="#38bdf8" />
+    <defs>
+      <linearGradient id="logoGlow" x1="0" y1="0" x2="40" y2="40">
+        <stop offset="0%" stopColor="#38bdf8" />
+        <stop offset="100%" stopColor="#7c5cff" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+const ChatBubbleGlow = ({ className, delay }) => (
+  <div className={`absolute z-20 p-2 rounded-full bg-gradient-to-br from-[#7c5cff] to-[#4f7cff] text-white shadow-lg shadow-purple-500/25 animate-float flex items-center justify-center w-10 h-10 border border-white/10 select-none ${className}`} style={{ animationDelay: delay }}>
+    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 11a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2z"/>
+    </svg>
+  </div>
+);
+
+const EasyStartedIcon = () => (
+  <div className="w-10 h-10 rounded-xl bg-[#7c5cff]/10 border border-[#7c5cff]/20 flex items-center justify-center text-purple-400 shadow-md shadow-purple-500/5 flex-shrink-0 transition-transform duration-300 hover:scale-105">
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  </div>
+);
+
+const FileSupportIcon = () => (
+  <div className="w-10 h-10 rounded-xl bg-[#7c5cff]/10 border border-[#7c5cff]/20 flex items-center justify-center text-purple-400 shadow-md shadow-purple-500/5 flex-shrink-0 transition-transform duration-300 hover:scale-105">
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+    </svg>
+  </div>
+);
+
+const AIPoweredIcon = () => (
+  <div className="w-10 h-10 rounded-xl bg-[#7c5cff]/10 border border-[#7c5cff]/20 flex items-center justify-center text-purple-400 shadow-md shadow-purple-500/5 flex-shrink-0 transition-transform duration-300 hover:scale-105">
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+    </svg>
+  </div>
+);
+
+const SyncIcon = () => (
+  <div className="w-10 h-10 rounded-xl bg-[#7c5cff]/10 border border-[#7c5cff]/20 flex items-center justify-center text-purple-400 shadow-md shadow-purple-500/5 flex-shrink-0 transition-transform duration-300 hover:scale-105">
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3 3L22 4" />
+    </svg>
+  </div>
+);
+
+const ImgBadgeIcon = () => (
+  <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth={2.5}>
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+    <polyline points="21 15 16 10 5 21" />
   </svg>
 );
 
@@ -186,7 +253,9 @@ export default function Register() {
 
       {/* Main card box */}
       <div className={`w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 rounded-3xl overflow-hidden border transition-all duration-300 shadow-2xl relative z-10 ${
-        theme === "dark" ? "border-gray-800/80 bg-[#060818]/60 backdrop-blur-xl" : "border-slate-200 bg-white/85 backdrop-blur-xl"
+        theme === "dark" 
+          ? "border-gray-800/80 bg-[#060818]/60 backdrop-blur-xl shadow-[0_0_50px_rgba(124,92,255,0.1)]" 
+          : "border-slate-200 bg-white/85 backdrop-blur-xl shadow-2xl"
       }`}>
         
         {/* Top Right Theme Toggle */}
@@ -206,112 +275,114 @@ export default function Register() {
         </div>
 
         {/* ================= LEFT COLUMN: CENTERED ANNOUNCEMENTS & FIXED BUBBLES ================= */}
-        <div className={`p-8 md:p-12 flex flex-col justify-between border-r transition-all duration-300 relative overflow-hidden ${
+        <div className={`hidden md:flex p-10 lg:p-12 flex-col justify-between border-r transition-all duration-300 relative overflow-hidden ${
           theme === "dark" 
             ? "bg-gradient-to-br from-[#080517] to-[#040615] border-gray-800/60" 
             : "bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200"
         }`}>
           
           {/* Upper Title */}
-          <div className="flex items-center gap-3 justify-center w-full">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-blue-500/20">
-              💬
-            </div>
+          <div className="flex items-center gap-3 w-full">
+            <LogoSVG />
             <span className={`text-xl font-bold tracking-wide ${theme === "dark" ? "text-white" : "text-slate-900"}`}>AI Chat</span>
           </div>
 
           {/* Centered Illustration Section */}
-          <div className="flex-1 flex flex-col justify-center items-center my-6 space-y-6">
+          <div className="flex-1 flex flex-col justify-center my-auto w-full">
             
-            {/* Robot illustration with exact positioned bubbles */}
-            <div className="w-72 h-72 relative flex items-center justify-center">
-              
-              {/* PDF bubble: top-left of robot */}
-              <div 
-                className="absolute top-8 left-6 z-20 p-2 rounded-full bg-gradient-to-br from-pink-500 to-red-500 text-white font-extrabold text-[10px] shadow-lg shadow-pink-500/25 animate-float flex items-center justify-center w-11 h-11 border border-white/10 select-none"
-              >
-                PDF
-              </div>
-              
-              {/* DOC bubble: bottom-left of robot */}
-              <div 
-                className="absolute bottom-12 left-6 z-20 p-2 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 text-white font-extrabold text-[10px] shadow-lg shadow-green-500/25 animate-float flex items-center justify-center w-11 h-11 border border-white/10 select-none"
-                style={{ animationDelay: '1.5s' }}
-              >
-                DOC
-              </div>
-              
-              {/* IMG bubble: top-right of robot */}
-              <div 
-                className="absolute top-8 right-6 z-20 p-2 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 text-white font-extrabold text-[10px] shadow-lg shadow-blue-500/25 animate-float flex items-center justify-center w-11 h-11 border border-white/10 select-none"
-                style={{ animationDelay: '0.8s' }}
-              >
-                IMG
-              </div>
-
-              {/* Horizontally centered robot */}
-              <RobotSVG />
-            </div>
-
-            {/* Centered robot text exactly below robot illustration */}
-            <div className="text-center">
-              <h2 className={`text-3xl font-extrabold tracking-tight transition-colors duration-300 ${
+            {/* Header Title */}
+            <div className="text-left mb-8">
+              <h2 className={`text-4xl font-extrabold tracking-tight transition-colors duration-300 ${
                 theme === "dark" ? "text-white" : "text-slate-900"
               }`}>
-                Create <span className="gradient-text">Your Account</span> ✨
+                Create <span className="text-[#7c5cff] bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Your Account</span> ✨
               </h2>
-              <p className={`mt-2 max-w-sm mx-auto text-sm leading-relaxed transition-colors duration-300 ${
+              <p className={`mt-2 text-sm leading-relaxed transition-colors duration-300 ${
                 theme === "dark" ? "text-gray-400" : "text-slate-500"
               }`}>
                 Join thousands of users and start your AI journey today
               </p>
             </div>
 
-            {/* Feature Checklist aligned to one vertical center line */}
-            <div className="space-y-3.5 max-w-xs w-full text-left mt-2">
-              <div className="flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${
-                  theme === "dark" ? "bg-purple-500/10 border border-purple-500/30 text-purple-400" : "bg-purple-100 border border-purple-200 text-purple-600"
-                }`}>✓</div>
-                <div>
-                  <h4 className={`text-xs font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Easy to Get Started</h4>
-                  <p className={`text-[10px] ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Create your account in seconds</p>
+            {/* Checklist & Robot side-by-side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center w-full">
+              
+              {/* Checklist */}
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <EasyStartedIcon />
+                  <div>
+                    <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Easy to Get Started</h4>
+                    <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Create your account in seconds</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <FileSupportIcon />
+                  <div>
+                    <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Multiple File Support</h4>
+                    <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Upload images, docs, PDFs & more</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <AIPoweredIcon />
+                  <div>
+                    <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>AI-Powered Insights</h4>
+                    <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Get accurate and helpful responses</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <SyncIcon />
+                  <div>
+                    <h4 className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Sync Everywhere</h4>
+                    <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Access your chats on any device</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${
-                  theme === "dark" ? "bg-purple-500/10 border border-purple-500/30 text-purple-400" : "bg-purple-100 border border-purple-200 text-purple-600"
-                }`}>✓</div>
-                <div>
-                  <h4 className={`text-xs font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Multiple File Support</h4>
-                  <p className={`text-[10px] ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Upload images, docs, PDFs & more</p>
+
+              {/* Robot with perfectly placed floating badges */}
+              <div className="relative w-full flex items-center justify-center h-80">
+                {/* PDF bubble: top-left of robot */}
+                <div 
+                  className="absolute top-4 left-4 z-20 p-2 rounded-full bg-gradient-to-br from-pink-500 to-red-500 text-white font-extrabold text-[10px] shadow-lg shadow-pink-500/25 animate-float flex items-center justify-center w-11 h-11 border border-white/10 select-none"
+                >
+                  PDF
                 </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${
-                  theme === "dark" ? "bg-purple-500/10 border border-purple-500/30 text-purple-400" : "bg-purple-100 border border-purple-200 text-purple-600"
-                }`}>✓</div>
-                <div>
-                  <h4 className={`text-xs font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>AI-Powered Insights</h4>
-                  <p className={`text-[10px] ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Get accurate and helpful responses</p>
+                
+                {/* DOC bubble: bottom-left of robot */}
+                <div 
+                  className="absolute bottom-10 left-4 z-20 p-2 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 text-white font-extrabold text-[10px] shadow-lg shadow-green-500/25 animate-float flex items-center justify-center w-11 h-11 border border-white/10 select-none"
+                  style={{ animationDelay: '1.5s' }}
+                >
+                  DOC
                 </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${
-                  theme === "dark" ? "bg-purple-500/10 border border-purple-500/30 text-purple-400" : "bg-purple-100 border border-purple-200 text-purple-600"
-                }`}>✓</div>
-                <div>
-                  <h4 className={`text-xs font-semibold ${theme === "dark" ? "text-gray-200" : "text-slate-800"}`}>Sync Everywhere</h4>
-                  <p className={`text-[10px] ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Access your chats on any device</p>
+                
+                {/* IMG bubble: top-right of robot */}
+                <div 
+                  className="absolute top-4 right-4 z-20 p-2 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 text-white font-extrabold shadow-lg shadow-blue-500/25 animate-float flex items-center justify-center w-11 h-11 border border-white/10 select-none"
+                  style={{ animationDelay: '0.8s' }}
+                  title="Image support"
+                >
+                  <ImgBadgeIcon />
                 </div>
+
+                {/* Additional floating chat bubbles */}
+                <ChatBubbleGlow className="bottom-12 right-2 w-8 h-8" delay="2.2s" />
+
+                {/* Horizontally centered robot */}
+                <RobotSVG />
               </div>
+
             </div>
+
           </div>
 
-          <div className="mt-8 pt-6 border-t border-gray-800/40 text-center">
-            <p className={`text-xs italic ${theme === "dark" ? "text-gray-500" : "text-slate-400"}`}>
+          <div className="mt-8 pt-6">
+            <div className={`glass px-5 py-2.5 rounded-2xl text-xs inline-block max-w-xs text-gray-400 border border-gray-800/40 shadow-md backdrop-blur-sm`}>
               "Experience the power of advanced multimodality."
-            </p>
+            </div>
           </div>
         </div>
 
@@ -321,8 +392,44 @@ export default function Register() {
         }`}>
           <div className="w-full max-w-sm mx-auto">
             
-            {/* Header Text */}
-            <div className="mb-6">
+            {/* Mobile-only Header & Illustration (hidden on Desktop) */}
+            <div className="md:hidden flex flex-col items-center w-full mb-6">
+              {/* Mobile Header Bar */}
+              <div className="w-full flex items-center justify-between mb-8 select-none">
+                <div className="flex items-center gap-2.5">
+                  <LogoSVG />
+                  <span className="text-lg font-bold text-white tracking-wide">AI Chat</span>
+                </div>
+              </div>
+
+              {/* Mobile Centered Robot with badges */}
+              <div className="relative w-60 h-60 flex items-center justify-center mb-6">
+                <div className="absolute top-4 left-4 z-20 p-2 rounded-full bg-gradient-to-br from-pink-500 to-red-500 text-white font-extrabold text-[10px] shadow-lg shadow-pink-500/25 animate-float flex items-center justify-center w-11 h-11 border border-white/10 select-none">
+                  PDF
+                </div>
+                <div className="absolute bottom-10 left-4 z-20 p-2 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 text-white font-extrabold text-[10px] shadow-lg shadow-green-500/25 animate-float flex items-center justify-center w-11 h-11 border border-white/10 select-none" style={{ animationDelay: '1.5s' }}>
+                  DOC
+                </div>
+                <div className="absolute top-4 right-4 z-20 p-2 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 text-white font-extrabold shadow-lg shadow-blue-500/25 animate-float flex items-center justify-center w-11 h-11 border border-white/10 select-none" style={{ animationDelay: '0.8s' }}>
+                  <ImgBadgeIcon />
+                </div>
+                <ChatBubbleGlow className="bottom-10 right-2 w-8 h-8" delay="2s" />
+                <RobotSVG />
+              </div>
+
+              {/* Mobile Welcome Text */}
+              <div className="text-center mb-2">
+                <h2 className="text-3xl font-extrabold tracking-tight text-white">
+                  Create <span className="text-[#7c5cff] bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Your Account</span> ✨
+                </h2>
+                <p className="mt-2 text-xs text-gray-400 max-w-xs mx-auto">
+                  Join thousands of users today and start your AI journey today
+                </p>
+              </div>
+            </div>
+
+            {/* Desktop Header Text */}
+            <div className="hidden md:block mb-6">
               <h3 className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-slate-900"}`}>Create Your Account</h3>
               <p className={`text-xs mt-1.5 font-medium ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>Join thousands of users today</p>
             </div>
@@ -338,17 +445,21 @@ export default function Register() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-3.5">
               
-              {/* Full Name (Username) */}
+              {/* Full Name */}
               <div>
                 <label className={`block text-xs font-semibold mb-1.5 ${theme === "dark" ? "text-gray-300" : "text-slate-700"}`}>Full Name</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </span>
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter your full name"
-                    className={`w-full pl-11 pr-4 py-2.5 rounded-xl text-sm outline-none transition duration-200 ${
+                    className={`w-full pl-12 pr-4 py-2.5 rounded-xl text-sm outline-none transition duration-200 ${
                       theme === "dark"
                         ? "bg-[#0b0e24] border border-gray-800 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30"
                         : "bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20"
@@ -362,13 +473,17 @@ export default function Register() {
               <div>
                 <label className={`block text-xs font-semibold mb-1.5 ${theme === "dark" ? "text-gray-300" : "text-slate-700"}`}>Email</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 00-2 2z" />
+                    </svg>
+                  </span>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className={`w-full pl-11 pr-4 py-2.5 rounded-xl text-sm outline-none transition duration-200 ${
+                    className={`w-full pl-12 pr-4 py-2.5 rounded-xl text-sm outline-none transition duration-200 ${
                       theme === "dark"
                         ? "bg-[#0b0e24] border border-gray-800 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30"
                         : "bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20"
@@ -382,13 +497,17 @@ export default function Register() {
               <div>
                 <label className={`block text-xs font-semibold mb-1.5 ${theme === "dark" ? "text-gray-300" : "text-slate-700"}`}>Password</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </span>
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Create a password"
-                    className={`w-full pl-11 pr-12 py-2.5 rounded-xl text-sm outline-none transition duration-200 ${
+                    className={`w-full pl-12 pr-12 py-2.5 rounded-xl text-sm outline-none transition duration-200 ${
                       theme === "dark"
                         ? "bg-[#0b0e24] border border-gray-800 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30"
                         : "bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20"
@@ -398,9 +517,18 @@ export default function Register() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition cursor-pointer"
                   >
-                    {showPassword ? "🙈" : "👁️"}
+                    {showPassword ? (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
@@ -409,13 +537,17 @@ export default function Register() {
               <div>
                 <label className={`block text-xs font-semibold mb-1.5 ${theme === "dark" ? "text-gray-300" : "text-slate-700"}`}>Confirm Password</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </span>
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm your password"
-                    className={`w-full pl-11 pr-4 py-2.5 rounded-xl text-sm outline-none transition duration-200 ${
+                    className={`w-full pl-12 pr-4 py-2.5 rounded-xl text-sm outline-none transition duration-200 ${
                       theme === "dark"
                         ? "bg-[#0b0e24] border border-gray-800 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30"
                         : "bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20"
@@ -466,8 +598,8 @@ export default function Register() {
               <div className={`flex-1 h-[1px] ${theme === "dark" ? "bg-gray-800/80" : "bg-slate-200"}`} />
             </div>
 
-            {/* Social signups side-by-side */}
-            <div className="grid grid-cols-2 gap-3.5">
+            {/* Social signups - Desktop version side-by-side with text */}
+            <div className="hidden md:grid grid-cols-2 gap-3.5">
               <button
                 type="button"
                 onClick={() => alert("Google signup is currently in mockup mode.")}
@@ -491,6 +623,32 @@ export default function Register() {
               >
                 <GithubIcon />
                 <span>GitHub</span>
+              </button>
+            </div>
+
+            {/* Social signups - Mobile version side-by-side with icons only */}
+            <div className="flex md:hidden grid grid-cols-2 gap-3.5 w-full">
+              <button
+                type="button"
+                onClick={() => alert("Google signup is currently in mockup mode.")}
+                className={`py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center cursor-pointer border transition duration-300 ${
+                  theme === "dark"
+                    ? "social-button text-gray-200"
+                    : "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700 hover:border-slate-300"
+                }`}
+              >
+                <GoogleIcon />
+              </button>
+              <button
+                type="button"
+                onClick={() => alert("GitHub signup is currently in mockup mode.")}
+                className={`py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center cursor-pointer border transition duration-300 ${
+                  theme === "dark"
+                    ? "social-button text-gray-200"
+                    : "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700 hover:border-slate-300"
+                }`}
+              >
+                <GithubIcon />
               </button>
             </div>
 
