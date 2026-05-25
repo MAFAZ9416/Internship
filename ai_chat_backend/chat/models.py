@@ -59,6 +59,15 @@ class Conversation(models.Model):
         blank=True
     )
 
+    is_pinned = models.BooleanField(
+        default=False
+    )
+
+    pinned_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
 
 class Message(models.Model):
 

@@ -12,24 +12,6 @@ class ChatSerializer(serializers.Serializer):
     )
 
 
-class MessageSerializer(serializers.ModelSerializer):
-
-    class Meta:
-
-        model = Message
-
-        fields = [
-            'id',
-            'role',
-            'content',
-            'token_count',
-            'response_time',
-            'created_at',
-            'edited_at',
-            'original_content'
-        ]
-
-
 class UploadedFileSerializer(serializers.ModelSerializer):
 
     file_size_display = serializers.SerializerMethodField()
@@ -39,75 +21,132 @@ class UploadedFileSerializer(serializers.ModelSerializer):
         model = UploadedFile
 
         fields = [
-            'id',
-            'file',
-            'file_name',
-            'file_type',
-            'file_size',
-            'file_size_display',
-            'uploaded_at'
+
+            "id",
+            "file",
+            "file_name",
+            "file_type",
+            "file_size",
+            "file_size_display",
+            "uploaded_at"
+
         ]
 
-        read_only_fields = [
-            'id',
-            'file',
-            'file_name',
-            'file_type',
-            'file_size',
-            'file_size_display',
-            'uploaded_at'
-        ]
+        read_only_fields = fields
 
-    def get_file_size_display(self, obj):
-        """Convert bytes to human-readable format"""
-        size = obj.file_size
-        for unit in ['B', 'KB', 'MB', 'GB']:
-            if size < 1024.0:
+
+    def get_file_size_display(self,obj):
+
+        size=obj.file_size
+
+        for unit in [
+
+            "B",
+            "KB",
+            "MB",
+            "GB"
+
+        ]:
+
+            if size<1024:
+
                 return f"{size:.2f} {unit}"
-            size /= 1024.0
+
+            size/=1024
+
         return f"{size:.2f} TB"
+
+
+
+class MessageSerializer(serializers.ModelSerializer):
+
+    files=UploadedFileSerializer(
+
+        source="uploaded_files",
+
+        many=True,
+
+        read_only=True
+
+    )
+
+
+    class Meta:
+
+        model=Message
+
+        fields=[
+
+            "id",
+            "role",
+            "content",
+            "token_count",
+            "response_time",
+            "created_at",
+            "edited_at",
+            "original_content",
+            "files"
+
+        ]
 
 
 
 class ConversationSerializer(serializers.ModelSerializer):
 
-    messages = MessageSerializer(
-        source='message_set',
+    messages=MessageSerializer(
+
+        source="message_set",
+
         many=True,
+
         read_only=True
+
     )
 
-    uploaded_files = UploadedFileSerializer(
+    uploaded_files=UploadedFileSerializer(
+
         many=True,
+
         read_only=True
+
     )
+
 
     class Meta:
 
-        model = Conversation
+        model=Conversation
 
-        fields = [
-            'id',
-            'title',
-            'model',
-            'system_prompt',
-            'created_at',
-            'updated_at',
-            'is_archived',
-            'archived_at',
-            'messages',
-            'uploaded_files'
+        fields=[
+
+            "id",
+            "title",
+            "model",
+            "system_prompt",
+            "created_at",
+            "updated_at",
+            "is_archived",
+            "archived_at",
+            "is_pinned",
+            "pinned_at",
+            "messages",
+            "uploaded_files"
+
         ]
+
+
 
 class AIModelSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = AIModel
 
-        fields = [
-            'id',
-            'model_name',
-            'display_name',
-            'max_tokens',
-            'is_active'
+        model=AIModel
+
+        fields=[
+
+            "id",
+            "model_name",
+            "display_name",
+            "max_tokens",
+            "is_active"
+
         ]

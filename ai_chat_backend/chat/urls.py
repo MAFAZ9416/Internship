@@ -73,5 +73,39 @@ urlpatterns = [
         name="rename-conversation"
     ),
 
+    # Pin conversation
+    path(
+        "history/<uuid:id>/pin/",
+        PinConversationView.as_view(),
+        name="pin-conversation"
+    ),
+
+    # Unpin conversation
+    path(
+        "history/<uuid:id>/unpin/",
+        UnpinConversationView.as_view(),
+        name="unpin-conversation"
+    ),
+
+    # Search archived conversations
+    path(
+        "history/archived/search/",
+        SearchArchivedConversationsView.as_view(),
+        name="search-archived"
+    ),
+
+    # Audio transcription
+    path(
+        "upload/audio/transcribe/",
+        AudioTranscribeView.as_view(),
+        name="audio-transcribe"
+    ),
+
+    # Video processing
+    path(
+        "upload/video/process/",
+        VideoProcessView.as_view(),
+        name="video-process"
+    ),
 
 ]
