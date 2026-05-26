@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = "http://localhost:5173";
+const BASE_URL = "http://localhost:5174";
 
 async function runE2E() {
   console.log("==================================================");

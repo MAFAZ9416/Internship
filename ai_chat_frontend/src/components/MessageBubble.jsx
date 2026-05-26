@@ -1,17 +1,11 @@
 import React, { useState } from "react";
 import Toast from "./Toast";
+import { FaCopy, FaEdit, FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
-// Inline Bot Avatar
+// Bot Avatar
 const BotAvatar = () => (
-  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 select-none animate-pulse flex-shrink-0 border border-blue-400/20">
+  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white shadow-lg flex-shrink-0 border border-purple-500/20 select-none">
     🤖
-  </div>
-);
-
-// Inline User Avatar - premium mockup face image
-const UserAvatar = () => (
-  <div className="w-9 h-9 rounded-full border border-purple-500/30 overflow-hidden shadow-md flex-shrink-0 select-none">
-    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80" alt="User" className="w-full h-full object-cover" />
   </div>
 );
 
@@ -25,9 +19,14 @@ export default function MessageBubble({
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(message.content || "");
   const [isSaving, setIsSaving] = useState(false);
+  const [feedback, setFeedback] = useState(null); // 'like' | 'dislike' | null
 
   const theme = localStorage.getItem("theme") || "dark";
   const content = message.content || "";
+
+  React.useEffect(() => {
+    setEditedText(content);
+  }, [content]);
 
   const copyToClipboard = async (text) => {
     try {
@@ -53,49 +52,35 @@ export default function MessageBubble({
       setIsSaving(false);
     }
   };
-const formatTime = (dateVal) => {
 
-  if(!dateVal){
-    return "";
-  }
-
-  const d = new Date(dateVal);
-
-  if(isNaN(d.getTime())){
-    return "";
-  }
-
-  return d.toLocaleTimeString(
-    [],
-    {
-      hour:"2-digit",
-      minute:"2-digit"
-    }
-  );
-
-};
+  const formatTime = (dateVal) => {
+    if (!dateVal) return "";
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
 
   return (
     <div className={`flex gap-3 mb-6 items-start w-full transition-all duration-300 ${
       isUser ? "justify-end" : "justify-start"
     }`}>
       
-      {/* Bot Avatar on the Left (for AI Message) */}
+      {/* Bot Avatar on the Left (for AI Message only) */}
       {!isUser && <BotAvatar />}
 
-      {/* Message Bubble box wrapper */}
-      <div className={`max-w-[75%] flex flex-col group`}>
+      {/* Message Content Bubble wrapper */}
+      <div className={`max-w-[70%] flex flex-col group relative ${isUser ? "items-end" : "items-start"}`}>
         
-        {/* The main card shape */}
+        {/* The main bubble container */}
         <div
-          className={`rounded-2xl px-4 py-3 shadow-md relative transition-all duration-300 ${
+          className={`rounded-2xl px-4.5 py-3.5 shadow-md relative transition-all duration-300 ${
             isEditing 
-              ? "bg-[#0b0e24] border border-gray-800" 
+              ? "bg-[#070B14] border border-white/10" 
               : isUser
-                ? "bg-[#25235c] border border-[#3e3b8a] text-white rounded-tr-none shadow-[0_0_15px_rgba(124,92,255,0.05)]"
+                ? "bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-white rounded-tr-none shadow-purple-500/5 select-text"
                 : theme === "dark"
-                  ? "bg-[#0d1a2f] border border-[#1a2d4f] text-gray-200 drop-shadow-[0_0_8px_rgba(34,211,238,0.02)]"
-                  : "bg-white border border-slate-200 text-slate-800 shadow-sm"
+                  ? "bg-[#0F172A]/50 border border-white/5 text-gray-200 rounded-tl-none select-text"
+                  : "bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm select-text"
           }`}
         >
           {isEditing ? (
@@ -103,19 +88,19 @@ const formatTime = (dateVal) => {
               <textarea
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
-                className={`w-full p-2.5 rounded-xl text-sm border outline-none text-white bg-[#030514] border-gray-800 focus:border-purple-500`}
+                className="w-full p-3 rounded-xl text-xs border outline-none text-white bg-[#070B14] border-white/5 focus:border-[#7C3AED] resize-none"
                 rows={3}
               />
-              <div className="flex gap-2 justify-end">
+              <div className="flex gap-2 justify-end select-none">
                 <button
-                  onClick={() => setIsEditing(false)}
-                  className="bg-gray-800/80 hover:bg-gray-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition cursor-pointer"
+                  onClick={() => { setIsEditing(false); setEditedText(content); }}
+                  className="bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  className="bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+                  className="bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-white text-[10px] font-bold px-3.5 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5"
                 >
                   {isSaving ? "Saving..." : "Save"}
                 </button>
@@ -123,9 +108,9 @@ const formatTime = (dateVal) => {
             </div>
           ) : (
             <>
-              {/* Render Attached Files if present */}
+              {/* Render Attached Files inside Glass Containers */}
               {message.files && message.files.length > 0 && (
-                <div className="flex flex-col gap-3 mb-3.5">
+                <div className="flex flex-col gap-3 mb-3">
                   {message.files.map((file, idx) => {
                     const fileType = (file.type || file.file_type || "").toLowerCase();
                     const fileUrl = file.preview || file.url || file.file;
@@ -134,7 +119,7 @@ const formatTime = (dateVal) => {
                     // IMAGE PREVIEW
                     if (["png", "jpg", "jpeg", "webp", "gif"].includes(fileType) || fileType.startsWith("image/")) {
                       return (
-                        <div key={idx} className="relative group overflow-hidden rounded-xl border border-gray-700/50 bg-black/10 max-w-sm">
+                        <div key={idx} className="relative group overflow-hidden rounded-xl border border-white/5 bg-black/10 max-w-sm select-none">
                           <img
                             src={fileUrl}
                             alt={fileName}
@@ -149,33 +134,33 @@ const formatTime = (dateVal) => {
                       );
                     }
 
-                    // PDF CARD
+                    // PDF BADGE CARD
                     if (fileType === "pdf" || fileType === "application/pdf") {
                       return (
-                        <div key={idx} className={`flex items-center gap-3 p-3 rounded-xl border transition max-w-xs ${
+                        <div key={idx} className={`flex items-center gap-3.5 p-3 rounded-xl border transition max-w-xs select-none ${
                           isUser 
-                            ? "bg-white/10 border-white/20" 
-                            : "bg-gradient-to-r from-red-500/10 to-pink-500/10 border-red-500/20"
+                            ? "bg-white/10 border-white/10" 
+                            : "bg-[#070B14]/40 border-white/5"
                         }`}>
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center text-white text-[10px] font-black shadow-md flex-shrink-0 select-none">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center text-white text-[10px] font-black shadow-md flex-shrink-0">
                             PDF
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className={`text-xs font-bold truncate ${isUser ? "text-white" : "text-gray-200"}`}>{fileName}</p>
-                            <p className="text-[9px] opacity-70 mt-0.5">PDF Document • Attachment</p>
+                            <p className="text-[9px] opacity-70 mt-0.5">PDF Document</p>
                           </div>
-                          <a href={fileUrl} download={fileName} className="p-1.5 bg-gray-900/60 hover:bg-gray-800 rounded-lg text-xs text-white" title="Download file">
+                          <a href={fileUrl} download={fileName} className="p-1.5 bg-black/40 hover:bg-black/60 rounded-lg text-xs text-white" title="Download">
                             📥
                           </a>
                         </div>
                       );
                     }
 
-                    // AUDIO PREVIEW CARD
+                    // AUDIO PREVIEW
                     if (["mp3", "wav", "audio/mpeg", "audio/wav", "audio/x-wav"].includes(fileType)) {
                       return (
-                        <div key={idx} className={`flex flex-col gap-2 p-3 rounded-xl border max-w-xs ${
-                          isUser ? "bg-white/10 border-white/20" : "bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border-yellow-500/20"
+                        <div key={idx} className={`flex flex-col gap-2 p-3 rounded-xl border max-w-xs select-none ${
+                          isUser ? "bg-white/10 border-white/10" : "bg-[#070B14]/40 border-white/5"
                         }`}>
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-500 to-amber-500 flex items-center justify-center text-white text-sm flex-shrink-0">
@@ -186,22 +171,21 @@ const formatTime = (dateVal) => {
                               <p className="text-[9px] text-gray-400 mt-0.5">Audio Recording</p>
                             </div>
                           </div>
-                          <audio controls className="w-full h-8 text-xs mt-1 bg-gray-900/40 rounded-xl border border-gray-700/30">
+                          <audio controls className="w-full h-8 text-xs mt-1 bg-black/20 rounded-xl border border-white/5">
                             <source src={fileUrl} type="audio/mpeg" />
-                            Your browser does not support the audio element.
                           </audio>
                         </div>
                       );
                     }
 
-                    // VIDEO CARD PLAYER
+                    // VIDEO CARD
                     if (["mp4", "mov", "video/mp4", "video/quicktime"].includes(fileType)) {
                       return (
-                        <div key={idx} className={`flex flex-col gap-2 p-3 rounded-xl border max-w-sm ${
-                          isUser ? "bg-white/10 border-white/20" : "bg-gradient-to-r from-red-500/10 to-indigo-500/10 border-red-500/20"
+                        <div key={idx} className={`flex flex-col gap-2 p-3 rounded-xl border max-w-sm select-none ${
+                          isUser ? "bg-white/10 border-white/10" : "bg-[#070B14]/40 border-white/5"
                         }`}>
                           <div className="flex items-center gap-2.5 mb-0.5">
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white text-sm flex-shrink-0">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white text-sm flex-shrink-0">
                               🎬
                             </div>
                             <div className="min-w-0 flex-1">
@@ -209,25 +193,24 @@ const formatTime = (dateVal) => {
                               <p className="text-[9px] text-gray-400">Video Capture</p>
                             </div>
                           </div>
-                          <video controls className="w-full rounded-lg bg-black border border-gray-800 max-h-[220px]">
+                          <video controls className="w-full rounded-lg bg-black border border-white/5 max-h-[220px]">
                             <source src={fileUrl} type="video/mp4" />
-                            Your browser does not support the video element.
                           </video>
                         </div>
                       );
                     }
 
-                    // DEFAULT CARD PREVIEW (TEXT, DOCX, ETC)
+                    // DEFAULT FILE BADGE
                     return (
-                      <div key={idx} className={`flex items-center gap-3.5 p-3 rounded-xl border max-w-xs ${
-                        isUser ? "bg-white/10 border-white/20" : "bg-gray-800/40 border-gray-700/80"
+                      <div key={idx} className={`flex items-center gap-3.5 p-3 rounded-xl border max-w-xs select-none ${
+                        isUser ? "bg-white/10 border-white/10" : "bg-[#070B14]/40 border-white/5"
                       }`}>
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm flex-shrink-0">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs flex-shrink-0">
                           📄
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-bold truncate text-gray-200">{fileName}</p>
-                          <p className="text-[9px] text-gray-400">{fileType === "docx" ? "Word Document" : "Attachment"}</p>
+                          <p className="text-[9px] text-gray-400">Word/Text Document</p>
                         </div>
                       </div>
                     );
@@ -235,9 +218,9 @@ const formatTime = (dateVal) => {
                 </div>
               )}
 
-              {/* Text content rendered with rich breaks */}
+              {/* Message text */}
               {content && (
-                <p className="text-sm whitespace-pre-wrap leading-relaxed tracking-wide select-text">
+                <p className="text-xs font-semibold whitespace-pre-wrap leading-relaxed tracking-wide">
                   {content}
                 </p>
               )}
@@ -245,51 +228,63 @@ const formatTime = (dateVal) => {
           )}
         </div>
 
-        {/* Small details footer below bubble card */}
-        <div className={`flex items-center gap-2 mt-1.5 text-[10px] text-gray-500 select-none ${
+        {/* Small footer wrapper containing timestamp and actions */}
+        <div className={`flex items-center gap-2.5 mt-1.5 text-[9px] text-gray-500 select-none ${
           isUser ? "justify-end pr-1" : "justify-start pl-1"
         }`}>
           {/* Timestamp */}
-          <span>
-{
-formatTime(
-message.created_at
-)
-}
-</span>
+          <span className="font-bold">{formatTime(message.created_at || message.timestamp)}</span>
           
-          {/* Micro Edit + Copy options displayed beautifully on hover or inline */}
+          {/* Double Checkmark for User bubble */}
+          {isUser && (
+            <span className="text-[#A855F7] font-extrabold ml-0.5" title="Sent ✓">✓✓</span>
+          )}
+
+          {/* Action pills displayed on card hover */}
           {!isEditing && (
-            <div className="flex gap-2.5 items-center opacity-0 group-hover:opacity-100 transition-opacity duration-150 ml-2">
+            <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2">
               {isUser && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="text-purple-400 hover:text-purple-300 font-medium cursor-pointer"
+                  className="text-[#A855F7] hover:text-[#7C3AED] transition cursor-pointer flex items-center gap-1 font-bold"
                 >
-                  Edit
+                  <FaEdit size={8} />
+                  <span>Edit</span>
                 </button>
               )}
               <button
                 onClick={() => copyToClipboard(content)}
-                className="text-gray-400 hover:text-white font-medium cursor-pointer"
+                className="text-gray-400 hover:text-white transition cursor-pointer flex items-center gap-1 font-bold"
               >
-                Copy
+                <FaCopy size={8} />
+                <span>Copy</span>
               </button>
+              
+              {/* Thumbs Up / Thumbs Down Actions for AI bubble */}
+              {!isUser && (
+                <>
+                  <button
+                    onClick={() => { setFeedback("like"); setToastMessage("Thank you for your feedback! 👍"); setShowToast(true); }}
+                    className={`transition cursor-pointer ${feedback === "like" ? "text-purple-400" : "text-gray-400 hover:text-white"}`}
+                    title="Helpful response"
+                  >
+                    <FaThumbsUp size={8} />
+                  </button>
+                  <button
+                    onClick={() => { setFeedback("dislike"); setToastMessage("Logged down detailed response check. 👎"); setShowToast(true); }}
+                    className={`transition cursor-pointer ${feedback === "dislike" ? "text-red-400" : "text-gray-400 hover:text-white"}`}
+                    title="Not helpful response"
+                  >
+                    <FaThumbsDown size={8} />
+                  </button>
+                </>
+              )}
             </div>
-          )}
-          
-          {/* Double Checkmark indicators for User messages */}
-          {isUser && (
-            <span className="text-purple-400 font-bold ml-1" title="Sent ✓">✓✓</span>
           )}
         </div>
 
       </div>
 
-      {/* User Avatar on the Right (for User Message) */}
-      {isUser && <UserAvatar />}
-
-      {/* Toast feedback alerts */}
       <Toast
         isVisible={showToast}
         message={toastMessage}

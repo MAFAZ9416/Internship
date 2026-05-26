@@ -248,31 +248,30 @@ class ConversationHistoryView(APIView):
                 "created_at"
             )
 
-            serializer=MessageSerializer(
-                messages,
-                many=True
-            )
-
-            uploaded_files=UploadedFileSerializer(
-                UploadedFile.objects.filter(
-                    message__conversation=conversation
-                ),
-                many=True
-            ).data
+            data = []
+            for msg in messages:
+                data.append({
+                    "id": str(msg.id),
+                    "role": msg.role,
+                    "content": msg.content,
+                    "files": UploadedFileSerializer(
+                        UploadedFile.objects.filter(message=msg),
+                        many=True
+                    ).data
+                })
 
             return Response({
 
-                "id":
-                str(conversation.id),
+                "id": str(conversation.id),
 
-                "title":
-                conversation.title,
+                "title": conversation.title,
 
-                "messages":
-                serializer.data,
+                "messages": data,
 
-                "uploaded_files":
-                uploaded_files
+                "uploaded_files": UploadedFileSerializer(
+                    UploadedFile.objects.filter(message__conversation=conversation),
+                    many=True
+                ).data
 
             })
 

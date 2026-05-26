@@ -11,23 +11,21 @@ class ChatSerializer(serializers.Serializer):
         allow_null=True
     )
 
-
-class UploadedFileSerializer(serializers.ModelSerializer):
-
-    file_size_display = serializers.SerializerMethodField()
+class UploadedFileSerializer(
+    serializers.ModelSerializer
+):
 
     class Meta:
 
-        model = UploadedFile
+        model=UploadedFile
 
-        fields = [
+        fields=[
 
             "id",
             "file",
             "file_name",
             "file_type",
-            "file_size",
-            "file_size_display"
+            "file_size"
 
         ]
 
@@ -57,6 +55,7 @@ class UploadedFileSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
+    files = UploadedFileSerializer(many=True, read_only=True)
 
     class Meta:
 
@@ -70,7 +69,8 @@ class MessageSerializer(serializers.ModelSerializer):
             'response_time',
             'created_at',
             'edited_at',
-            'original_content'
+            'original_content',
+            'files'
         ]
 
 class ConversationSerializer(serializers.ModelSerializer):
