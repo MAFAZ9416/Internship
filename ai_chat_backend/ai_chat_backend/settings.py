@@ -9,7 +9,11 @@ SECRET_KEY = 'django-insecure-(fcfvlb=zi*heq91m^yt)g-vj*+-rpq$obzxfvn3x#wo7cqjo4
 
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com",
+]
 
 
 INSTALLED_APPS = [
