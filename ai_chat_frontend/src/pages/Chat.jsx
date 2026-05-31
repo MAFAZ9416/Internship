@@ -36,6 +36,7 @@ export default function Chat() {
   const [activeMobileTab, setActiveMobileTab] = useState("chats"); // chats | files | voice | profile
   const [mobileSubTab, setMobileSubTab] = useState("recent"); // pinned | recent | archived
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [showSelectorMenu, setShowSelectorMenu] = useState(false);
 
   // Voice tab dictation state
   const [transcribedVoiceMsg, setTranscribedVoiceMsg] = useState("");
@@ -115,7 +116,16 @@ export default function Chat() {
       setTranscribedVoiceMsg(text);
     };
 
+    rec.onstart = () => {
+      setIsVoiceListening(true);
+    };
+
     rec.onend = () => {
+      setIsVoiceListening(false);
+    };
+
+    rec.onerror = (err) => {
+      console.log('Voice recognition error:', err);
       setIsVoiceListening(false);
     };
 
@@ -127,11 +137,17 @@ export default function Chat() {
       alert("Speech recognition not supported in this browser.");
       return;
     }
-    if (isVoiceListening) {
-      voiceRecognitionRef.current.stop();
-    } else {
-      voiceRecognitionRef.current.start();
-      setIsVoiceListening(true);
+    try {
+      if (isVoiceListening) {
+        voiceRecognitionRef.current.stop();
+        setIsVoiceListening(false);
+      } else {
+        voiceRecognitionRef.current.start();
+        setIsVoiceListening(true);
+      }
+    } catch (err) {
+      console.log('toggleMobileVoice error:', err);
+      setIsVoiceListening(false);
     }
   };
 
@@ -227,6 +243,14 @@ export default function Chat() {
         await api.post("/upload/", formData, {
           headers: {
             "Content-Type": "multipart/form-data"
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            if (data.onProgress) {
+              files.forEach((file) => {
+                data.onProgress(file.name, percentCompleted);
+              });
+            }
           }
         });
         await selectConversation(conversationId);
@@ -234,13 +258,24 @@ export default function Chat() {
 
       /* AI message */
       const aiMessage = {
-        id: response.data.message_id || Date.now() + 1,
+        id: response.data.ai_message_id || Date.now() + 1,
         role: "assistant",
         content: response.data.response || "No response",
         timestamp: new Date()
       };
 
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages((prev) => {
+        const updated = prev.map((msg) => {
+          if (msg.id === userMessage.id) {
+            return {
+              ...msg,
+              id: response.data.message_id || msg.id
+            };
+          }
+          return msg;
+        });
+        return [...updated, aiMessage];
+      });
       fetchConversations();
     } catch (error) {
       console.log("Send error:", error);
@@ -415,6 +450,37 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
     }
   };
 
+  const deleteMessage = async (messageId) => {
+    if (!confirm("Are you sure you want to delete this message?")) return;
+    setMessages(prev => prev.filter(msg => msg.id !== messageId));
+    try {
+      await api.delete(`/history/messages/${messageId}/`);
+    } catch (e) {
+      console.log("Backend message delete:", e);
+    }
+  };
+
+  const regenerateMessage = async (messageId) => {
+    const index = messages.findIndex(msg => msg.id === messageId);
+    if (index === -1) return;
+
+    let userPromptMsg = null;
+    for (let i = index - 1; i >= 0; i--) {
+      if (messages[i].role === "user") {
+        userPromptMsg = messages[i];
+        break;
+      }
+    }
+
+    if (!userPromptMsg) {
+      alert("Could not locate original prompt for regeneration.");
+      return;
+    }
+
+    setMessages(prev => prev.filter(msg => msg.id !== messageId));
+    await sendMessage({ message: userPromptMsg.content });
+  };
+
   const selectConversation = async (id) => {
     setCurrentConversationId(id);
     localStorage.setItem("currentConversationId", id);
@@ -542,6 +608,21 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
     }
   };
 
+  const renameConversation = async (id) => {
+    const activeChat = conversations.find((c) => c.id === id) || archivedConversations.find((c) => c.id === id);
+    const currentTitle = activeChat ? activeChat.title : "";
+    const newName = prompt("Rename conversation to:", currentTitle);
+    if (!newName?.trim() || newName === currentTitle) return;
+    try {
+      await api.patch(`history/${id}/rename/`, {
+        title: newName
+      });
+      fetchConversations();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Toggle pin from Header
   const handleTogglePinCurrent = async () => {
     if (!currentConversationId) return;
@@ -644,6 +725,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
         onRestoreConversation={restoreConversation}
         onPinConversation={pinConversation}
         onUnpinConversation={unpinConversation}
+        onRenameConversation={renameConversation}
         activeConversationId={currentConversationId}
         sidebarWidth={sidebarWidth}
         onSidebarWidthChange={setSidebarWidth}
@@ -661,37 +743,54 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
             ======================================================== */}
         {isMobile ? (
           /* Mobile Top Navbar */
-          <header className={`h-14 flex items-center justify-between px-4 border-b select-none z-30 flex-shrink-0 ${
-            theme === "dark" ? "bg-[#070B14] border-white/5" : "bg-white border-slate-200 shadow-sm"
+          <header className={`h-16 flex items-center justify-between px-4 border-b select-none z-30 flex-shrink-0 sticky top-0 ${
+            theme === "dark" ? "bg-[#070B14] border-white/5 text-white" : "bg-white border-slate-200 text-slate-800 shadow-sm"
           }`}>
             <button
               onClick={() => setIsMobileSidebarOpen(true)}
-              className="p-2 text-gray-400 hover:text-white transition cursor-pointer"
+              className={`p-2 transition cursor-pointer rounded-lg hover:bg-white/5 ${
+                theme === "dark" ? "text-white hover:text-purple-400" : "text-slate-800 hover:text-purple-600"
+              }`}
             >
-              <FaBars size={18} />
+              <FaBars size={16} />
             </button>
             <div className="flex items-center gap-2">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#7C3AED]" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="currentColor" />
+              <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#A855F7] fill-current" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2l2.4 7.2 7.2 2.4-7.2 2.4-2.4 7.2-2.4-7.2-7.2-2.4 7.2-2.4Z"/>
               </svg>
-              <span className={`text-sm font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-slate-900"}`}>
+              <span className="text-sm font-extrabold tracking-tight">
                 AI Chat
               </span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 items-center">
               <button
-                onClick={() => alert("Search option.")}
-                className="p-2 text-gray-400 hover:text-white cursor-pointer"
+                onClick={() => setIsMobileSidebarOpen(true)}
+                className={`p-2 transition cursor-pointer rounded-lg hover:bg-white/5 ${
+                  theme === "dark" ? "text-white" : "text-slate-600 hover:text-slate-800"
+                }`}
+                title="Search Chats"
               >
-                <FaSearch size={14} />
+                <FaSearch size={12} />
               </button>
               <button
-                onClick={newChat}
-                className="p-2 text-[#7C3AED] hover:text-[#A855F7] cursor-pointer"
+                onClick={() => {
+                  newChat();
+                  setCurrentConversationId(null);
+                }}
+                className="w-8 h-8 rounded-lg bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center cursor-pointer transition font-bold shadow-md shadow-purple-500/10 text-xs active:scale-95 duration-100"
                 title="New Chat"
               >
-                📝
+                ➕
               </button>
+                <button
+                  onClick={toggleTheme}
+                  className={`p-2 transition cursor-pointer rounded-lg hover:bg-white/5 ${
+                    theme === "dark" ? "text-white" : "text-slate-800"
+                  }`}
+                  title="Toggle theme"
+                >
+                  {theme === "dark" ? "🌙" : "☀️"}
+                </button>
             </div>
           </header>
         ) : (
@@ -802,310 +901,156 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
             VIEWPORT BODY (Desktop vs Mobile Viewport Switcher)
             ======================================================== */}
         {isMobile ? (
-          /* MOBILE PERSISTENT TABS VIEWPORT */
-          <div className="flex-1 overflow-hidden flex flex-col bg-transparent relative">
+          /* MOBILE REDESIGNED CHAT VIEWPORT */
+          <div className="flex-1 overflow-hidden flex flex-col bg-transparent relative pb-[72px]">
             
-            {/* Sub-tabs rendered below header for "chats" mobile tab */}
-            {activeMobileTab === "chats" && (
-              <div className={`h-11 border-b flex items-center px-4 justify-around text-xs font-bold select-none flex-shrink-0 ${
-                theme === "dark" ? "bg-[#070B14]/60 border-white/5" : "bg-white border-slate-200"
-              }`}>
-                <button
-                  onClick={() => setMobileSubTab("pinned")}
-                  className={`py-2 px-3 border-b-2 transition ${
-                    mobileSubTab === "pinned" ? "border-[#7C3AED] text-[#A855F7]" : "border-transparent text-gray-500"
-                  }`}
-                >
-                  Pinned
-                </button>
-                <button
-                  onClick={() => setMobileSubTab("recent")}
-                  className={`py-2 px-3 border-b-2 transition ${
-                    mobileSubTab === "recent" ? "border-[#7C3AED] text-[#A855F7]" : "border-transparent text-gray-500"
-                  }`}
-                >
-                  Recent
-                </button>
-                <button
-                  onClick={() => setMobileSubTab("archived")}
-                  className={`py-2 px-3 border-b-2 transition ${
-                    mobileSubTab === "archived" ? "border-[#7C3AED] text-[#A855F7]" : "border-transparent text-gray-500"
-                  }`}
-                >
-                  Archived
-                </button>
+            {/* If no conversation is active: show Welcome Screen inside main chat container */}
+            {!currentConversationId ? (
+              <div className="flex-1 overflow-y-auto">
+                <ChatWindow
+                  messages={[]}
+                  isTyping={false}
+                  onEditMessage={() => {}}
+                  onSendSuggestion={sendMessage}
+                />
               </div>
-            )}
-
-            {/* Tab: Chats (renders chat list if current conversation id is null, else renders message bubble pane) */}
-            {activeMobileTab === "chats" && (
+            ) : (
+              /* If conversation is active: show premium top selector card, messages, and input */
               <div className="flex-1 flex flex-col overflow-hidden">
-                {!currentConversationId ? (
-                  /* Conversations List for Mobile */
-                  <div className="flex-1 overflow-y-auto p-4 space-y-2 select-none">
-                    <h3 className="text-[10px] font-bold text-gray-500 tracking-wider uppercase pl-2 mb-2">
-                      Conversations ({mobileConversationsList.length})
-                    </h3>
-                    {mobileConversationsList.map((chat) => (
-                      <div
-                        key={chat.id}
-                        onClick={() => selectConversation(chat.id)}
-                        className={`p-4 rounded-xl border flex items-center justify-between transition ${
-                          theme === "dark" ? "bg-[#0F172A]/50 border-white/5 text-white" : "bg-white border-slate-200 shadow-sm"
-                        }`}
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-bold truncate">{chat.title || "New Chat"}</p>
-                          <p className="text-[10px] text-gray-500 mt-1">
-                            {chat.is_pinned ? "📌 Pinned" : "💬 Recent"}
-                          </p>
-                        </div>
-                        <span className="text-xs text-gray-400 font-semibold select-none pr-1">→</span>
-                      </div>
-                    ))}
-                    {mobileConversationsList.length === 0 && (
-                      <div className="py-20 text-center">
-                        <span className="text-4xl">💬</span>
-                        <p className="text-xs text-gray-500 mt-2">No conversations in this section</p>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  /* Live conversation chat pane for Mobile */
-                  <div className="flex-1 flex flex-col overflow-hidden">
-                    {/* Tiny header return banner on mobile */}
-                    <div className={`h-9 px-4 border-b flex items-center justify-between text-[10px] font-bold select-none ${
-                      theme === "dark" ? "bg-[#0F172A]/40 border-white/5" : "bg-slate-50 border-slate-200"
-                    }`}>
-                      <button 
-                        onClick={() => setCurrentConversationId(null)}
-                        className="text-[#A855F7] font-extrabold cursor-pointer"
-                      >
-                        ← Back to chats list
-                      </button>
-                      <button 
-                        onClick={deleteCurrentConversation}
-                        className="text-red-400 cursor-pointer"
-                      >
-                        Delete Chat
-                      </button>
-                    </div>
-                    
-                    <ChatWindow
-                      messages={messages}
-                      isTyping={isTyping}
-                      onEditMessage={editMessage}
-                      onSendSuggestion={sendMessage}
-                    />
-                    <ChatInput onSend={sendMessage} />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Tab: Files list view on Mobile */}
-            {activeMobileTab === "files" && (
-              <div className="flex-1 overflow-y-auto p-4 select-none animate-fade-in">
-                <h3 className={`text-xs font-bold mb-4 flex items-center gap-2 ${theme === "dark" ? "text-gray-300" : "text-slate-800"}`}>
-                  <span>📁</span>
-                  <span>Conversation Attachments ({mobileUploadedFiles.length})</span>
-                </h3>
-                {mobileUploadedFiles.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-3">
-                    {mobileUploadedFiles.map((file, index) => (
-                      <div key={index} className={`p-4 rounded-2xl border flex flex-col justify-between h-28 ${
-                        theme === "dark" ? "bg-[#0F172A]/50 border-white/5 text-white" : "bg-white border-slate-200 text-slate-800 shadow-sm"
-                      }`}>
-                        <div className="min-w-0">
-                          <p className="text-[9px] text-gray-500 truncate uppercase tracking-wider font-extrabold">{file.sender === "user" ? "Sent by You" : "AI File"}</p>
-                          <p className="text-xs font-bold mt-1.5 truncate leading-tight pr-1">{file.name || "Attachment"}</p>
-                        </div>
-                        <div className="flex justify-between items-center mt-2 pt-2 border-t border-white/5">
-                          <span className="text-[9px] uppercase font-bold text-gray-500">{file.type?.substring(0, 10) || "Document"}</span>
-                          <a
-                            href={file.preview || file.url || file.file}
-                            download={file.name}
-                            className="text-[10px] text-[#A855F7] font-bold hover:underline"
-                          >
-                            Download
-                          </a>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="h-full flex flex-col justify-center items-center text-center py-20">
-                    <span className="text-4xl mb-3 animate-float">📁</span>
-                    <h4 className="text-sm font-bold text-gray-400">No media attached</h4>
-                    <p className="text-xs text-gray-500 mt-1">Upload images, PDFs, or audio inside chats.</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Tab: Voice recorder Dictation screen */}
-            {activeMobileTab === "voice" && (
-              <div className="flex-1 flex flex-col justify-between p-6 select-none animate-fade-in">
-                <div className="text-center pt-4">
-                  <h3 className={`text-base font-extrabold ${theme === "dark" ? "text-white" : "text-slate-900"}`}>
-                    Speech dictation transcription
-                  </h3>
-                  <p className="text-[10px] text-gray-500 mt-1">Hands-free speech dictation</p>
-                </div>
-
-                {/* Circular mic triggers */}
-                <div className="flex justify-center my-6">
-                  <button
-                    type="button"
-                    onClick={toggleMobileVoice}
-                    className={`w-32 h-32 rounded-full flex flex-col items-center justify-center transition-all duration-300 cursor-pointer shadow-lg ${
-                      isVoiceListening 
-                        ? "bg-red-500/20 text-red-500 border-2 border-red-500 animate-pulse shadow-red-500/30" 
-                        : "bg-[#7C3AED]/10 text-[#A855F7] border-2 border-white/5 hover:border-[#7C3AED] shadow-purple-500/5"
-                    }`}
-                  >
-                    <FaMicrophone size={32} />
-                    <span className="text-[9px] uppercase tracking-widest font-extrabold mt-2.5">
-                      {isVoiceListening ? "Listening..." : "Tap to Speak"}
-                    </span>
-                  </button>
-                </div>
-
-                <div className="flex-1 flex flex-col">
-                  <label className="block text-[9px] font-bold text-gray-500 mb-2 uppercase tracking-widest">Transcription Output</label>
-                  <textarea
-                    value={transcribedVoiceMsg}
-                    onChange={(e) => setTranscribedVoiceMsg(e.target.value)}
-                    placeholder="Transcribed voice messages appear here..."
-                    className={`w-full flex-1 p-4 rounded-2xl border text-xs outline-none resize-none transition ${
-                      theme === "dark" 
-                        ? "bg-[#070B14] border-white/5 text-white placeholder-gray-600" 
-                        : "bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 shadow-inner"
-                    }`}
-                  />
-                  
-                  <button
-                    onClick={handleSendMobileVoice}
-                    disabled={!transcribedVoiceMsg.trim()}
-                    className="w-full mt-4 py-3 rounded-xl font-bold text-white btn-gradient cursor-pointer disabled:opacity-40"
-                  >
-                    Send to AI Assistant
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Tab: User Profile overview */}
-            {activeMobileTab === "profile" && (
-              <div className="flex-1 overflow-y-auto p-6 select-none flex flex-col justify-between animate-fade-in">
-                <div className="space-y-6">
-                  {/* General details */}
-                  <div className="flex flex-col items-center text-center pt-6">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-extrabold text-2xl shadow-xl shadow-purple-500/20 mb-4 select-none border border-white/10">
-                      {initials}
-                    </div>
-                    <h3 className={`text-base font-bold ${theme === "dark" ? "text-white" : "text-slate-900"}`}>
-                      {user?.username || "AI Chat User"}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-1">{user?.email || ""}</p>
-                  </div>
-
-                  {/* General mock stats */}
-                  <div className={`p-4 rounded-2xl border ${
-                    theme === "dark" ? "bg-white/5 border-white/5" : "bg-slate-50 border-slate-200 shadow-sm"
+                {/* Premium Mobile Conversation Selector Card */}
+                <div className="p-3.5 flex-shrink-0">
+                  <div className={`p-3 rounded-2xl border flex items-center justify-between shadow-md ${
+                    theme === "dark" ? "bg-[#0F172A]/85 border-white/10 text-white" : "bg-white border-slate-200 text-slate-800"
                   }`}>
-                    <h4 className="text-[9px] font-extrabold text-gray-500 uppercase tracking-widest mb-3">Usage Statistics</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <span className="text-[10px] text-gray-500 block">Total Chats</span>
-                        <span className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-slate-800"}`}>
-                          {conversations.length}
-                        </span>
+                    <div 
+                      className="flex items-center gap-3 min-w-0 cursor-pointer flex-1"
+                      onClick={() => setIsMobileSidebarOpen(true)}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#7C3AED] text-white flex items-center justify-center flex-shrink-0 font-black text-xs select-none">
+                        📄
                       </div>
-                      <div>
-                        <span className="text-[10px] text-gray-500 block">Archived Chats</span>
-                        <span className={`text-sm font-bold ${theme === "dark" ? "text-white" : "text-slate-800"}`}>
-                          {archivedConversations.length}
-                        </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold truncate flex items-center gap-1.5">
+                          <span>{currentChatTitle || "Conversation"}</span>
+                          <FaChevronDown size={8} className="text-gray-400 flex-shrink-0" />
+                        </p>
+                        <p className="text-[8px] text-gray-500 font-extrabold uppercase tracking-widest mt-0.5">
+                          Tap to open drawer
+                        </p>
                       </div>
+                    </div>
+
+                    <div className="relative">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSelectorMenu(!showSelectorMenu);
+                        }}
+                        className="p-2 text-gray-400 hover:text-white transition cursor-pointer"
+                      >
+                        <FaEllipsisH size={12} />
+                      </button>
+
+                      {showSelectorMenu && (
+                        <div
+                          className={`absolute right-0 top-8 rounded-xl border shadow-xl z-50 p-1 flex flex-col w-36 ${
+                            theme === "dark"
+                              ? "bg-[#0F172A] border-white/10 text-white animate-fade-in"
+                              : "bg-white border-slate-200 text-slate-800 animate-fade-in"
+                          }`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            onClick={() => {
+                              setShowSelectorMenu(false);
+                              setCurrentConversationId(null);
+                            }}
+                            className="text-left px-2.5 py-1.5 text-[10px] font-bold rounded-lg hover:bg-white/5 transition cursor-pointer"
+                          >
+                            ← Back to Chats
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowSelectorMenu(false);
+                              handleRenameCurrent();
+                            }}
+                            className="text-left px-2.5 py-1.5 text-[10px] font-bold rounded-lg hover:bg-white/5 transition cursor-pointer"
+                          >
+                            Rename Chat
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowSelectorMenu(false);
+                              handleTogglePinCurrent();
+                            }}
+                            className="text-left px-2.5 py-1.5 text-[10px] font-bold rounded-lg hover:bg-white/5 transition cursor-pointer"
+                          >
+                            {isCurrentChatPinned ? "Unpin Chat" : "Pin Chat"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowSelectorMenu(false);
+                              archiveConversation(currentConversationId);
+                              setCurrentConversationId(null);
+                            }}
+                            className="text-left px-2.5 py-1.5 text-[10px] font-bold rounded-lg hover:bg-white/5 transition cursor-pointer"
+                          >
+                            Archive Chat
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowSelectorMenu(false);
+                              deleteCurrentConversation();
+                            }}
+                            className="text-left px-2.5 py-1.5 text-[10px] font-bold text-red-400 rounded-lg hover:bg-red-500/10 transition cursor-pointer"
+                          >
+                            Delete Chat
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
-                {/* Logout out pill button at bottom of mobile view */}
-                <button
-                  onClick={logout}
-                  className="w-full mt-8 py-3.5 rounded-xl border border-red-500/20 hover:border-red-500/40 bg-red-500/5 hover:bg-red-500/10 text-red-400 font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-md select-none active:scale-[0.98] duration-100"
-                >
-                  <RiLogoutBoxLine size={14} />
-                  <span>Logout</span>
-                </button>
+                {/* Message display area */}
+                <div className="flex-1 overflow-hidden flex flex-col">
+                  <ChatWindow
+                    messages={messages}
+                    isTyping={isTyping}
+                    onEditMessage={editMessage}
+                    onSendSuggestion={sendMessage}
+                    onDeleteMessage={deleteMessage}
+                    onRegenerateMessage={regenerateMessage}
+                  />
+                </div>
               </div>
             )}
 
-            {/* Persistent Mobile Bottom Navigation Bar */}
-            <nav className={`h-16 border-t flex items-center justify-around select-none z-40 flex-shrink-0 ${
-              theme === "dark" ? "bg-[#070B14] border-white/5 text-gray-400" : "bg-white border-slate-200 shadow-md text-slate-500"
-            }`}>
-              <button
-                onClick={() => setActiveMobileTab("chats")}
-                className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
-                  activeMobileTab === "chats" ? "text-[#A855F7] font-bold" : "hover:text-white"
-                }`}
-              >
-                <span className="text-base">💬</span>
-                <span className="text-[9px]">Chats</span>
-              </button>
-              <button
-                onClick={() => setActiveMobileTab("files")}
-                className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
-                  activeMobileTab === "files" ? "text-[#A855F7] font-bold" : "hover:text-white"
-                }`}
-              >
-                <span className="text-base">📁</span>
-                <span className="text-[9px]">Files</span>
-              </button>
-              <button
-                onClick={() => setActiveMobileTab("voice")}
-                className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
-                  activeMobileTab === "voice" ? "text-[#A855F7] font-bold" : "hover:text-white"
-                }`}
-              >
-                <span className="text-base">🎤</span>
-                <span className="text-[9px]">Voice</span>
-              </button>
-              <button
-                onClick={() => setActiveMobileTab("profile")}
-                className={`flex flex-col items-center gap-1 cursor-pointer transition select-none ${
-                  activeMobileTab === "profile" ? "text-[#A855F7] font-bold" : "hover:text-white"
-                }`}
-              >
-                <span className="text-base">👤</span>
-                <span className="text-[9px]">Profile</span>
-              </button>
-            </nav>
+            {/* ChatInput: rendered ALWAYS at bottom for mobile view when conversation is active or welcome suggestion is selected */}
+            <ChatInput onSend={sendMessage} />
 
             {/* Slide-over Mobile sidebar overlay container */}
             {isMobileSidebarOpen && (
-              <Sidebar
-                conversations={conversations}
-                archivedConversations={archivedConversations}
-                onSelectConversation={selectConversation}
-                onNewChat={newChat}
-                onDeleteConversation={deleteConversation}
-                onArchiveConversation={archiveConversation}
-                onRestoreConversation={restoreConversation}
-                onPinConversation={pinConversation}
-                onUnpinConversation={unpinConversation}
-                activeConversationId={currentConversationId}
-                isCollapsed={false}
-                onToggleCollapsed={() => {}}
-                onSidebarWidthChange={() => {}}
-                showArchivedChats={showArchivedChats}
-                onToggleShowArchivedChats={setShowArchivedChats}
-                isMobileOpen={isMobileSidebarOpen}
-                onCloseMobile={() => setIsMobileSidebarOpen(false)}
-              />
+               <Sidebar
+                 conversations={conversations}
+                 archivedConversations={archivedConversations}
+                 onSelectConversation={selectConversation}
+                 onNewChat={newChat}
+                 onDeleteConversation={deleteConversation}
+                 onArchiveConversation={archiveConversation}
+                 onRestoreConversation={restoreConversation}
+                 onPinConversation={pinConversation}
+                 onUnpinConversation={unpinConversation}
+                 onRenameConversation={renameConversation}
+                 activeConversationId={currentConversationId}
+                 isCollapsed={false}
+                 onToggleCollapsed={() => {}}
+                 onSidebarWidthChange={() => {}}
+                 showArchivedChats={showArchivedChats}
+                 onToggleShowArchivedChats={setShowArchivedChats}
+                 isMobileOpen={isMobileSidebarOpen}
+                 onCloseMobile={() => setIsMobileSidebarOpen(false)}
+               />
             )}
           </div>
         ) : (
@@ -1118,6 +1063,8 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
                   isTyping={isTyping}
                   onEditMessage={editMessage}
                   onSendSuggestion={sendMessage}
+                  onDeleteMessage={deleteMessage}
+                  onRegenerateMessage={regenerateMessage}
                 />
                 <ChatInput onSend={sendMessage} />
               </div>

@@ -1,17 +1,30 @@
+import React, { useRef, useEffect } from "react";
 import MessageBubble from "./MessageBubble";
 
 export default function ChatWindow({
   messages,
   isTyping,
   onEditMessage,
-  onSendSuggestion
+  onSendSuggestion,
+  onDeleteMessage,
+  onRegenerateMessage
 }) {
   const theme = localStorage.getItem("theme") || "dark";
+  const isMobile = window.innerWidth < 768;
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
 
   return (
     <div className="w-full h-full flex flex-col">
       {messages.length === 0 ? (
-        <div className="h-full flex flex-col justify-center items-center text-center p-8 select-none overflow-y-auto">
+        <div className={`h-full flex flex-col justify-center items-center text-center p-8 select-none overflow-y-auto ${isMobile ? 'pb-36' : ''}`}>
           <div className="text-6xl mb-4 animate-float drop-shadow-[0_0_20px_rgba(124,58,237,0.5)]">💬</div>
           <h1 className="text-3xl font-extrabold tracking-tight text-gradient mb-3">
             Start a Conversation
@@ -51,13 +64,15 @@ export default function ChatWindow({
           </div>
         </div>
       ) : (
-        <div className="space-y-4 w-full overflow-y-auto flex-1 p-4 md:p-6 pb-2">
+        <div className={`space-y-4 w-full overflow-y-auto flex-1 p-4 md:p-6 pb-2 ${isMobile ? 'pb-36' : 'pb-2'}`}>
           {messages.map((message, index) => (
             <MessageBubble
               key={message.id || index}
               message={message}
               isUser={message.role === "user"}
               onEditMessage={onEditMessage}
+              onDeleteMessage={onDeleteMessage}
+              onRegenerateMessage={onRegenerateMessage}
             />
           ))}
 
@@ -78,6 +93,8 @@ export default function ChatWindow({
               </div>
             </div>
           )}
+
+          <div ref={messagesEndRef} />
         </div>
       )}
     </div>

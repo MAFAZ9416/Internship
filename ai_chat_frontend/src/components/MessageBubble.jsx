@@ -12,7 +12,9 @@ const BotAvatar = () => (
 export default function MessageBubble({
   message,
   isUser,
-  onEditMessage
+  onEditMessage,
+  onDeleteMessage,
+  onRegenerateMessage
 }) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -20,9 +22,16 @@ export default function MessageBubble({
   const [editedText, setEditedText] = useState(message.content || "");
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState(null); // 'like' | 'dislike' | null
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const theme = localStorage.getItem("theme") || "dark";
   const content = message.content || "";
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   React.useEffect(() => {
     setEditedText(content);
@@ -59,6 +68,181 @@ export default function MessageBubble({
     if (isNaN(d.getTime())) return "";
     return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
+
+  if (isMobile) {
+    return (
+      <div className={`flex gap-2.5 mb-5 items-start w-full ${isUser ? "justify-end" : "justify-start"}`}>
+        {/* Bot Avatar on Left for AI Message */}
+        {!isUser && (
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white shadow-md flex-shrink-0 border border-purple-500/10 select-none text-[10px]">
+            🤖
+          </div>
+        )}
+
+        <div className={`max-w-[80%] flex flex-col ${isUser ? "items-end" : "items-start"}`}>
+          {/* Main Bubble */}
+          <div
+            className={`rounded-2xl px-4 py-3 shadow-md relative text-xs leading-relaxed ${
+              isEditing
+                ? theme === "dark" ? "bg-[#070B14] border border-white/10 text-white" : "bg-white border border-slate-300 text-slate-900"
+                : isUser
+                  ? "bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-white shadow-md shadow-purple-500/10"
+                  : theme === "dark"
+                    ? "bg-[#0F172A]/80 backdrop-blur-md border border-white/10 text-gray-200"
+                    : "bg-white border border-slate-200 text-slate-800 shadow-sm"
+            }`}
+          >
+            {isEditing ? (
+              <div className="space-y-3 min-w-[200px]">
+                <textarea
+                  value={editedText}
+                  onChange={(e) => setEditedText(e.target.value)}
+                  className={`w-full p-2.5 rounded-xl text-xs border outline-none ${
+                    theme === "dark" ? "text-white bg-[#070B14] border-white/10" : "text-slate-900 bg-white border-slate-300"
+                  }`}
+                  rows={3}
+                />
+                <div className="flex gap-2 justify-end">
+                  <button
+                    onClick={() => { setIsEditing(false); setEditedText(content); }}
+                    className="bg-white/5 hover:bg-white/10 text-[9px] font-bold px-2.5 py-1 rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveEdit}
+                    className="bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-white text-[9px] font-bold px-3 py-1 rounded-lg transition"
+                  >
+                    {isSaving ? "Saving..." : "Save"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Render Attached Files inside Glass Containers */}
+                {message.files && message.files.length > 0 && (
+                  <div className="flex flex-col gap-2.5 mb-2.5">
+                    {message.files.map((file, idx) => {
+                      const fileType = (file.type || file.file_type || "").toLowerCase();
+                      const fileUrl = file.preview || file.url || file.file;
+                      const fileName = file.name || file.file_name || "Attachment";
+
+                      // IMAGE PREVIEW
+                      if (fileType.startsWith("image/") || ["png", "jpg", "jpeg", "webp", "gif"].includes(fileType) || fileType.includes("image")) {
+                        return (
+                          <div key={idx} className="flex flex-col gap-1 select-none max-w-xs">
+                            <div className="relative overflow-hidden rounded-xl border border-white/5 bg-black/10">
+                              <img
+                                src={fileUrl}
+                                alt={file.name}
+                                className="rounded-xl max-w-full object-cover border border-white/10"
+                              />
+                            </div>
+                            <p className="text-[10px] text-gray-400 truncate mt-1">
+                              {file.name}
+                            </p>
+                          </div>
+                        );
+                      }
+
+                      // PDF/DOCX/TXT/ALL DOCUMENT CARDS
+                      return (
+                        <div key={idx} className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition max-w-xs select-none ${
+                          isUser ? "bg-white/10 border-white/10" : "bg-[#070B14]/40 border-white/5"
+                        }`}>
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-[9px] font-black shadow-md flex-shrink-0 ${
+                            fileType.includes("pdf") ? "bg-gradient-to-br from-pink-500 to-red-500" : "bg-gradient-to-br from-blue-500 to-indigo-500"
+                          }`}>
+                            {fileType.includes("pdf") ? "PDF" : "DOC"}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] font-bold truncate">{fileName}</p>
+                            <p className="text-[8px] opacity-70 mt-0.5">Attachment Card</p>
+                          </div>
+                          <a href={fileUrl} download={fileName} className="p-1.5 bg-black/40 hover:bg-black/60 rounded-lg text-xs text-white" title="Download">
+                            📥
+                          </a>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Message text */}
+                {content && (
+                  <p className="text-[11px] font-medium whitespace-pre-wrap leading-relaxed">
+                    {content}
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Timestamp, double checkmark and mobile actions */}
+          <div className="flex flex-wrap items-center gap-2 mt-1 text-[8px] text-gray-500 select-none pr-1">
+            <span>{formatTime(message.created_at || message.timestamp)}</span>
+            {isUser && (
+              <span className="text-[#A855F7] font-extrabold" title="Sent ✓">✓✓</span>
+            )}
+            
+            {!isEditing && (
+              <div className="flex gap-2 items-center ml-2 border-l border-white/10 pl-2">
+                {isUser ? (
+                  <>
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="text-[#A855F7] hover:text-[#7C3AED] transition cursor-pointer font-bold"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => onDeleteMessage?.(message.id)}
+                      className="text-red-400 hover:text-red-500 transition cursor-pointer font-bold"
+                    >
+                      Delete
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => copyToClipboard(content)}
+                      className="text-gray-400 hover:text-white transition cursor-pointer font-bold"
+                    >
+                      Copy
+                    </button>
+                    <button
+                      onClick={() => onRegenerateMessage?.(message.id)}
+                      className="text-purple-400 hover:text-purple-500 transition cursor-pointer font-bold"
+                    >
+                      Regenerate
+                    </button>
+                    <button
+                      onClick={() => { setFeedback("like"); setToastMessage("Thank you for your feedback! 👍"); setShowToast(true); }}
+                      className={`transition cursor-pointer ${feedback === "like" ? "text-purple-400" : "text-gray-400"}`}
+                    >
+                      👍
+                    </button>
+                    <button
+                      onClick={() => { setFeedback("dislike"); setToastMessage("Logged down detailed response check. 👎"); setShowToast(true); }}
+                      className={`transition cursor-pointer ${feedback === "dislike" ? "text-red-400" : "text-gray-400"}`}
+                    >
+                      👎
+                    </button>
+                    <button
+                      onClick={() => onDeleteMessage?.(message.id)}
+                      className="text-red-400 hover:text-red-500 transition cursor-pointer font-bold"
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex gap-3 mb-6 items-start w-full transition-all duration-300 ${
@@ -250,26 +434,39 @@ export default function MessageBubble({
           {/* Action pills displayed on card hover */}
           {!isEditing && (
             <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2">
-              {isUser && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="text-[#A855F7] hover:text-[#7C3AED] transition cursor-pointer flex items-center gap-1 font-bold"
-                >
-                  <FaEdit size={8} />
-                  <span>Edit</span>
-                </button>
-              )}
-              <button
-                onClick={() => copyToClipboard(content)}
-                className="text-gray-400 hover:text-white transition cursor-pointer flex items-center gap-1 font-bold"
-              >
-                <FaCopy size={8} />
-                <span>Copy</span>
-              </button>
-              
-              {/* Thumbs Up / Thumbs Down Actions for AI bubble */}
-              {!isUser && (
+              {isUser ? (
                 <>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="text-[#A855F7] hover:text-[#7C3AED] transition cursor-pointer flex items-center gap-1 font-bold"
+                  >
+                    <FaEdit size={8} />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={() => onDeleteMessage?.(message.id)}
+                    className="text-red-400 hover:text-red-500 transition cursor-pointer flex items-center gap-1 font-bold"
+                    title="Delete Message"
+                  >
+                    <span>Delete</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => copyToClipboard(content)}
+                    className="text-gray-400 hover:text-white transition cursor-pointer flex items-center gap-1 font-bold"
+                  >
+                    <FaCopy size={8} />
+                    <span>Copy</span>
+                  </button>
+                  <button
+                    onClick={() => onRegenerateMessage?.(message.id)}
+                    className="text-purple-400 hover:text-purple-500 transition cursor-pointer flex items-center gap-1 font-bold"
+                    title="Regenerate AI Response"
+                  >
+                    <span>Regenerate</span>
+                  </button>
                   <button
                     onClick={() => { setFeedback("like"); setToastMessage("Thank you for your feedback! 👍"); setShowToast(true); }}
                     className={`transition cursor-pointer ${feedback === "like" ? "text-purple-400" : "text-gray-400 hover:text-white"}`}
@@ -283,6 +480,13 @@ export default function MessageBubble({
                     title="Not helpful response"
                   >
                     <FaThumbsDown size={8} />
+                  </button>
+                  <button
+                    onClick={() => onDeleteMessage?.(message.id)}
+                    className="text-red-400 hover:text-red-500 transition cursor-pointer flex items-center gap-1 font-bold"
+                    title="Delete Message"
+                  >
+                    <span>Delete</span>
                   </button>
                 </>
               )}

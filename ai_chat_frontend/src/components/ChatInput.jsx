@@ -12,10 +12,17 @@ export default function ChatInput({ onSend }) {
   const [uploadProgress, setUploadProgress] = useState({});
   const [fileError, setFileError] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const fileInputRef = useRef(null);
   const recognitionRef = useRef(null);
   const theme = localStorage.getItem("theme") || "dark";
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   /* Speech Recognition Setup */
   useEffect(() => {
@@ -40,7 +47,16 @@ export default function ChatInput({ onSend }) {
       setMessage(transcript);
     };
 
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
     recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.onerror = (err) => {
+      console.log('Speech recognition error:', err);
       setIsListening(false);
     };
 
@@ -53,11 +69,19 @@ export default function ChatInput({ onSend }) {
       return;
     }
 
-    if (isListening) {
-      recognitionRef.current.stop();
-    } else {
-      recognitionRef.current.start();
-      setIsListening(true);
+    try {
+      if (isListening) {
+        // attempt to stop; set state optimistically so UI updates immediately
+        recognitionRef.current.stop();
+        setIsListening(false);
+      } else {
+        recognitionRef.current.start();
+        // actual onstart will set the state; set optimistically as well
+        setIsListening(true);
+      }
+    } catch (err) {
+      console.log('Speech toggle error:', err);
+      setIsListening(false);
     }
   };
 
@@ -144,7 +168,12 @@ export default function ChatInput({ onSend }) {
         setMessage("");
       } else {
         setSelectedFiles((prev) => [...prev, ...regular]);
-        simulateProgress(regular);
+        regular.forEach((file) => {
+          setUploadProgress((prev) => ({
+            ...prev,
+            [file.name]: 0
+          }));
+        });
       }
     }
   };
@@ -178,7 +207,12 @@ export default function ChatInput({ onSend }) {
         setMessage("");
       } else {
         setSelectedFiles((prev) => [...prev, ...regular]);
-        simulateProgress(regular);
+        regular.forEach((file) => {
+          setUploadProgress((prev) => ({
+            ...prev,
+            [file.name]: 0
+          }));
+        });
       }
     }
   };
@@ -214,25 +248,255 @@ export default function ChatInput({ onSend }) {
     setShowUploadMenu(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!message.trim() && selectedFiles.length === 0 && !audioFile && !videoFile)
       return;
 
     if (audioFile) {
-      onSend({ message, audioFile });
+      await onSend({ message, audioFile });
       setMessage("");
       setAudioFile(null);
     } else if (videoFile) {
-      onSend({ message, videoFile });
+      await onSend({ message, videoFile });
       setMessage("");
       setVideoFile(null);
     } else {
-      onSend({ message, files: selectedFiles });
+      const filesToUpload = [...selectedFiles];
       setMessage("");
+      await onSend({
+        message,
+        files: filesToUpload,
+        onProgress: (fileName, percent) => {
+          setUploadProgress((prev) => ({
+            ...prev,
+            [fileName]: percent
+          }));
+        }
+      });
       setSelectedFiles([]);
+      setUploadProgress({});
     }
   };
+
+  if (isMobile) {
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-3 pb-safe bg-transparent pointer-events-none">
+        <div className="max-w-5xl mx-auto w-full pointer-events-auto">
+          {/* File Upload Progress, Previews & Error messages displayed right above the input bar */}
+          {(selectedFiles.length > 0 || audioFile || videoFile || fileError) && (
+            <div className="mb-2 p-2 bg-[#0F172A]/90 border border-white/5 backdrop-blur-md rounded-2xl shadow-xl flex flex-wrap gap-2">
+              {/* Image Previews */}
+              {selectedFiles.filter(f => f.type.startsWith("image/")).map((file, idx) => {
+                const previewUrl = URL.createObjectURL(file);
+                const progress = uploadProgress[file.name] || 0;
+                return (
+                  <div key={idx} className="relative w-14 h-14 rounded-xl overflow-hidden border border-white/10 bg-[#070B14]">
+                    <img src={previewUrl} className="w-full h-full object-cover" />
+                    {/* Progress overlay */}
+                    {progress > 0 && progress < 100 && (
+                      <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-[9px] text-white font-bold select-none z-5">
+                        <span>{progress}%</span>
+                        <div className="w-8 h-1 bg-white/20 rounded-full mt-1 overflow-hidden">
+                          <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${progress}%` }} />
+                        </div>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const realIdx = selectedFiles.indexOf(file);
+                        if (realIdx !== -1) handleRemoveFile(realIdx);
+                      }}
+                      className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-600/80 text-white flex items-center justify-center text-[10px] font-bold z-10"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                );
+              })}
+
+              {/* Doc Previews */}
+              {selectedFiles.filter(f => !f.type.startsWith("image/")).map((file, idx) => {
+                const progress = uploadProgress[file.name] || 0;
+                return (
+                  <div key={idx} className="relative w-14 h-14 rounded-xl border border-white/10 bg-[#7C3AED]/20 flex flex-col items-center justify-center p-1 text-[8px] text-white font-extrabold text-center min-w-0">
+                    <span className="truncate w-full">{file.name}</span>
+                    {/* Progress bar and text */}
+                    {progress > 0 && progress < 100 && (
+                      <>
+                        <div className="w-full bg-white/20 h-1 rounded-full mt-1 overflow-hidden">
+                          <div className="h-full bg-blue-400 transition-all duration-300" style={{ width: `${progress}%` }} />
+                        </div>
+                        <span className="text-[7px] text-purple-200 mt-0.5">{progress}%</span>
+                      </>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const targetFiles = selectedFiles.filter(f => !f.type.startsWith("image/"));
+                        const realIdx = selectedFiles.indexOf(targetFiles[idx]);
+                        if (realIdx !== -1) handleRemoveFile(realIdx);
+                      }}
+                      className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-600/80 text-white flex items-center justify-center text-[8px] font-bold z-10"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                );
+              })}
+
+              {/* Audio attached badge */}
+              {audioFile && (
+                <div className="relative w-14 h-14 rounded-xl border border-white/10 bg-yellow-500/20 flex flex-col items-center justify-center p-1 text-[8px] text-white font-extrabold text-center min-w-0">
+                  <span className="truncate w-full">🎵 Audio</span>
+                  <button
+                    type="button"
+                    onClick={handleRemoveAudio}
+                    className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-600/80 text-white flex items-center justify-center text-[8px] font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {/* Video attached badge */}
+              {videoFile && (
+                <div className="relative w-14 h-14 rounded-xl border border-white/10 bg-purple-500/20 flex flex-col items-center justify-center p-1 text-[8px] text-white font-extrabold text-center min-w-0">
+                  <span className="truncate w-full">🎬 Video</span>
+                  <button
+                    type="button"
+                    onClick={handleRemoveVideo}
+                    className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-600/80 text-white flex items-center justify-center text-[8px] font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {/* File size/type error */}
+              {fileError && (
+                <div className="w-full text-red-400 text-[10px] font-bold px-2 py-1 bg-red-950/20 rounded-lg">
+                  ⚠️ {fileError}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Floating Pill Input Tray */}
+          <div className={`p-2 rounded-[28px] border shadow-2xl backdrop-blur-lg flex items-center justify-center shadow-purple-500/10 ${
+            theme === "dark" 
+              ? "bg-[#0F172A]/85 border-white/10 shadow-[0_0_20px_rgba(124,58,237,0.15)]" 
+              : "bg-white/95 border-slate-200 shadow-slate-200/50"
+          }`}>
+            <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
+              {/* Attachment Button inside dark circle */}
+              <div className="relative flex-shrink-0 w-9 h-9">
+                <button
+                  type="button"
+                  onClick={() => setShowUploadMenu(!showUploadMenu)}
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer select-none text-base ${
+                    theme === "dark" 
+                      ? "bg-[#070B14] border border-white/5 text-gray-300 hover:bg-white/5" 
+                      : "bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  📎
+                </button>
+
+                {/* Upload Dropdown Menu */}
+                {showUploadMenu && (
+                  <div
+                    className={`absolute bottom-11 left-0 rounded-2xl border overflow-hidden w-44 shadow-2xl z-50 p-1 flex flex-col ${
+                      theme === "dark"
+                        ? "bg-[#0F172A] border-white/10 text-white animate-fade-in"
+                        : "bg-white border-slate-200 text-slate-800 animate-fade-in"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleUploadType("image")}
+                      className="text-left px-3.5 py-2 text-[10px] font-bold rounded-xl hover:bg-white/5 transition cursor-pointer"
+                    >
+                      🖼️ Image
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUploadType("document")}
+                      className="text-left px-3.5 py-2 text-[10px] font-bold rounded-xl hover:bg-white/5 transition cursor-pointer"
+                    >
+                      📄 Document / PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUploadType("audio")}
+                      className="text-left px-3.5 py-2 text-[10px] font-bold rounded-xl hover:bg-white/5 transition cursor-pointer"
+                    >
+                      🎵 Audio
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUploadType("video")}
+                      className="text-left px-3.5 py-2 text-[10px] font-bold rounded-xl hover:bg-white/5 transition cursor-pointer"
+                    >
+                      🎬 Video
+                    </button>
+                    <div className="border-t border-white/5 my-1" />
+                    <button
+                      type="button"
+                      onClick={() => handleUploadType("all")}
+                      className="text-left px-3.5 py-2 text-[10px] font-bold rounded-xl hover:bg-white/5 transition cursor-pointer"
+                    >
+                      📁 All Files
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Main Text Input */}
+              <input
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder={isListening ? "Listening closely..." : "Message AI assistant..."}
+                className={`flex-1 h-9 px-4 rounded-full text-xs font-semibold outline-none transition duration-200 min-w-0 ${
+                  theme === "dark"
+                    ? "bg-[#070B14] border border-white/5 text-white placeholder-gray-500 focus:border-[#7C3AED]"
+                    : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#7C3AED]"
+                }`}
+                disabled={audioFile || videoFile}
+              />
+
+              {/* Voice Dictation Button inside dark circle */}
+              <button
+                type="button"
+                onClick={toggleSpeech}
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer ${
+                  isListening 
+                    ? "bg-red-500/20 text-red-500 border border-red-500 animate-pulse" 
+                    : theme === "dark"
+                      ? "bg-[#070B14] border border-white/5 text-gray-300"
+                      : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <FaMicrophone size={11} className={isListening ? "text-red-500" : "text-gray-400"} />
+              </button>
+
+              {/* Purple Gradient Send Button */}
+              <button
+                type="submit"
+                className="w-9 h-9 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-white hover:scale-105 active:scale-95 transition-all duration-100 flex items-center justify-center cursor-pointer shadow-md shadow-purple-500/20"
+              >
+                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-white fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+        <input ref={fileInputRef} type="file" onChange={handleFileSelect} multiple className="hidden" />
+      </div>
+    );
+  }
 
   return (
     <div

@@ -1,11 +1,26 @@
 {
-  "totalTests": 52,
-  "passedTests": 34,
-  "failedTests": 18,
-  "warnings": 0,
-  "consoleErrors": [],
-  "networkFailures": [
-    "http://127.0.0.1:8000/api/auth/login/ (net::ERR_ABORTED)"
-  ],
-  "scorePercent": "65.4"
+  "Authentication": "PASS",
+  "Theme": "FAIL",
+  "Chat": "PASS",
+  "Edit": "PASS",
+  "Save": "PASS",
+  "Copy": "FAIL",
+  "Regenerate": "PASS",
+  "Rename": "FAIL",
+  "Pin": "FAIL",
+  "Archive": "FAIL",
+  "Delete": "FAIL",
+  "Upload Image": "FAIL",
+  "Upload PDF": "FAIL",
+  "Upload DOCX": "FAIL",
+  "Upload TXT": "FAIL",
+  "Refresh Persistence": "FAIL",
+  "Mobile Drawer": "FAIL",
+  "score": 29,
+  "issues": [
+    "Desktop Flow Error: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\\'Pin Chat\\')').first()\u001b[22m\n",
+    "Mobile Device [iPhone_SE] Flow Error: page.waitForTimeout: Target page, context or browser has been closed",
+    "Mobile Device [iPhone_12_Pro] Flow Error: page.waitForTimeout: Target page, context or browser has been closed",
+    "Mobile Device [Galaxy_S20_Ultra] Flow Error: page.waitForTimeout: Target page, context or browser has been closed"
+  ]
 }

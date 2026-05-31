@@ -215,5 +215,20 @@ export const apiMethods = {
         "Content-Type": "multipart/form-data"
       }
     });
+  },
+
+  // Delete conversation
+  delete: async (conversationId) => {
+    return api.delete(apiEndpoints.deleteConversation(conversationId));
+  },
+
+  // Archive conversation
+  archive: async (conversationId) => {
+    return api.post(apiEndpoints.archiveConversation(conversationId));
+  },
+
+  // Restore conversation
+  restore: async (conversationId) => {
+    return api.post(apiEndpoints.restoreConversation(conversationId));
   }
 };
