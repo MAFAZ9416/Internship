@@ -390,14 +390,19 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
           (msg) => ({
             ...msg,
             files:
-              msg.files?.map((file) => ({
-                id: file.id,
-                name: file.file_name,
-                type: file.file_type,
-                preview: file.file,
-                url: file.file,
-                size: file.file_size_display
-              })) || []
+              msg.files?.map((file) => {
+                const fileUrl = file.file?.startsWith("http")
+                  ? file.file
+                  : `http://127.0.0.1:8000${file.file}`;
+                return {
+                  id: file.id,
+                  name: file.file_name || file.name,
+                  type: file.file_type || file.type,
+                  preview: fileUrl,
+                  url: fileUrl,
+                  size: file.file_size_display || file.size
+                };
+              }) || []
           })
         );
         setMessages(formattedMessages);
@@ -415,7 +420,26 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
     localStorage.setItem("currentConversationId", id);
     try {
       const response = await api.get(`/history/${id}/`);
-      setMessages(response.data.messages || []);
+      const formattedMessages = (response.data.messages || []).map(
+        (msg) => ({
+          ...msg,
+          files:
+            msg.files?.map((file) => {
+              const fileUrl = file.file?.startsWith("http")
+                ? file.file
+                : `http://127.0.0.1:8000${file.file}`;
+              return {
+                id: file.id,
+                name: file.file_name || file.name,
+                type: file.file_type || file.type,
+                preview: fileUrl || file.preview,
+                url: fileUrl,
+                size: file.file_size_display || file.size
+              };
+            }) || []
+        })
+      );
+      setMessages(formattedMessages);
       setUploadedFiles(response.data.uploaded_files || []);
       
       // Focus Chats on mobile
@@ -680,7 +704,11 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
               {isCollapsed && (
                 <button
                   onClick={() => setIsCollapsed(false)}
-                  className="p-2 bg-white/5 border border-white/5 text-white rounded-xl hover:bg-white/10 mr-2 cursor-pointer"
+                  className={`p-2 border rounded-xl mr-2 cursor-pointer transition-colors ${
+                    theme === "dark"
+                      ? "bg-white/5 border-white/5 text-white hover:bg-white/10"
+                      : "bg-slate-100 border-slate-200 text-[#1E293B] hover:bg-slate-200"
+                  }`}
                   title="Show Sidebar"
                 >
                   ☰
@@ -1082,15 +1110,19 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
           </div>
         ) : (
           /* DESKTOP VIEWPORT LAYOUT */
-          <>
-            <ChatWindow
-              messages={messages}
-              isTyping={isTyping}
-              onEditMessage={editMessage}
-              onSendSuggestion={sendMessage}
-            />
-            <ChatInput onSend={sendMessage} />
-          </>
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="w-full h-full flex flex-col items-center">
+              <div className="w-full max-w-5xl h-full flex flex-col">
+                <ChatWindow
+                  messages={messages}
+                  isTyping={isTyping}
+                  onEditMessage={editMessage}
+                  onSendSuggestion={sendMessage}
+                />
+                <ChatInput onSend={sendMessage} />
+              </div>
+            </div>
+          </div>
         )}
 
       </div>

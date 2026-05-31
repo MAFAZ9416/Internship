@@ -239,9 +239,9 @@ export default function ChatInput({ onSend }) {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className="p-4 md:p-6 w-full select-none relative z-30"
+      className="w-full"
     >
-      <div className="max-w-4xl mx-auto relative">
+      <div className="w-full p-4 md:p-6">
         {/* Drag & drop overlay */}
         {isDragging && (
           <div className="absolute inset-0 rounded-3xl bg-[#7C3AED]/10 backdrop-blur-xs flex items-center justify-center text-[#A855F7] font-bold border-2 border-dashed border-[#7C3AED] z-50">
@@ -250,13 +250,51 @@ export default function ChatInput({ onSend }) {
         )}
 
         {/* Upload File Progress & Previews */}
+        {/* Upload File Progress & Previews */}
         {selectedFiles.length > 0 && (
-          <div className="mb-3 px-2">
-            <FileUploadPreview
-              files={selectedFiles}
-              uploadProgress={uploadProgress}
-              onRemove={handleRemoveFile}
-            />
+          <div className="mb-3 px-2 flex flex-col gap-2">
+            {/* Image Previews */}
+            {selectedFiles.filter(f => f.type.startsWith("image/")).length > 0 && (
+              <div className="flex flex-wrap gap-3 mb-2 p-3 bg-[#0F172A] rounded-xl border border-white/5 shadow-md">
+                {selectedFiles.filter(f => f.type.startsWith("image/")).map((file, idx) => {
+                  const previewUrl = URL.createObjectURL(file);
+                  return (
+                    <div key={idx} className="relative group rounded-xl overflow-hidden border border-white/10 bg-[#070B14] w-24 h-24">
+                      <img
+                        src={previewUrl}
+                        alt={file.name}
+                        className="w-full h-full object-cover rounded-xl"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const realIdx = selectedFiles.indexOf(file);
+                          if (realIdx !== -1) handleRemoveFile(realIdx);
+                        }}
+                        className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-red-600/80 hover:bg-red-600 text-white flex items-center justify-center text-xs font-bold transition cursor-pointer"
+                        title="Remove image"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Non-Image Files */}
+            {selectedFiles.filter(f => !f.type.startsWith("image/")).length > 0 && (
+              <FileUploadPreview
+                files={selectedFiles.filter(f => !f.type.startsWith("image/"))}
+                uploadProgress={uploadProgress}
+                onRemoveFile={(idx) => {
+                  const nonImageFiles = selectedFiles.filter(f => !f.type.startsWith("image/"));
+                  const target = nonImageFiles[idx];
+                  const realIdx = selectedFiles.indexOf(target);
+                  if (realIdx !== -1) handleRemoveFile(realIdx);
+                }}
+              />
+            )}
           </div>
         )}
 
@@ -309,18 +347,18 @@ export default function ChatInput({ onSend }) {
         )}
 
         {/* The FLOATING Pill Input Tray */}
-        <div className={`p-2.5 rounded-2xl border flex flex-col md:flex-row items-center gap-3 shadow-xl backdrop-blur-md ${
+        <div className={`p-2 rounded-2xl border shadow-xl backdrop-blur-md w-full flex items-center justify-center ${
           theme === "dark" 
             ? "bg-[#0F172A]/70 border-white/5 shadow-purple-500/5" 
             : "bg-white/95 border-slate-200 shadow-slate-200/40"
         }`}>
-          <div className="flex items-center gap-2.5 w-full md:w-auto flex-shrink-0">
+          <form onSubmit={handleSubmit} className="w-full flex items-center gap-3">
             {/* Attachment Button inside dark circle */}
-            <div className="relative">
+            <div className="relative flex-shrink-0 w-10 h-10">
               <button
                 type="button"
                 onClick={() => setShowUploadMenu(!showUploadMenu)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition cursor-pointer select-none text-base ${
+                className={`w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center transition cursor-pointer select-none text-base ${
                   theme === "dark" 
                     ? "bg-[#070B14] border border-white/5 text-gray-300 hover:bg-white/5" 
                     : "bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100"
@@ -342,28 +380,28 @@ export default function ChatInput({ onSend }) {
                   <button
                     type="button"
                     onClick={() => handleUploadType("image")}
-                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition"
+                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition cursor-pointer"
                   >
                     🖼️ Image Attachment
                   </button>
                   <button
                     type="button"
                     onClick={() => handleUploadType("document")}
-                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition"
+                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition cursor-pointer"
                   >
                     📄 Document / PDF
                   </button>
                   <button
                     type="button"
                     onClick={() => handleUploadType("audio")}
-                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition"
+                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition cursor-pointer"
                   >
                     🎵 Audio (mp3, wav)
                   </button>
                   <button
                     type="button"
                     onClick={() => handleUploadType("video")}
-                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition"
+                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition cursor-pointer"
                   >
                     🎬 Video (mp4, mov)
                   </button>
@@ -371,7 +409,7 @@ export default function ChatInput({ onSend }) {
                   <button
                     type="button"
                     onClick={() => handleUploadType("all")}
-                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition"
+                    className="text-left px-3.5 py-2 text-xs font-semibold rounded-xl hover:bg-white/5 transition cursor-pointer"
                   >
                     📁 All Files Browser
                   </button>
@@ -379,11 +417,24 @@ export default function ChatInput({ onSend }) {
               )}
             </div>
 
+            {/* Main Text Input */}
+            <input
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder={isListening ? "Listening closely... start speaking" : "Message AI assistant..."}
+              className={`flex-1 h-12 px-5 rounded-full text-xs font-semibold outline-none transition duration-200 min-w-0 ${
+                theme === "dark"
+                  ? "bg-[#070B14] border border-white/5 text-white placeholder-gray-500 focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
+                  : "bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
+              }`}
+              disabled={audioFile || videoFile}
+            />
+
             {/* Voice Dictation Button inside dark circle */}
             <button
               type="button"
               onClick={toggleSpeech}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition flex-shrink-0 cursor-pointer ${
+              className={`w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center transition cursor-pointer ${
                 isListening 
                   ? "bg-red-500/20 text-red-500 border border-red-500 animate-pulse" 
                   : theme === "dark"
@@ -394,27 +445,11 @@ export default function ChatInput({ onSend }) {
             >
               <FaMicrophone size={13} className={isListening ? "text-red-500" : "text-gray-400"} />
             </button>
-          </div>
-
-          {/* Form wrapper */}
-          <form onSubmit={handleSubmit} className="flex-1 flex gap-3.5 w-full items-center">
-            {/* Main Text Input */}
-            <input
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={isListening ? "Listening closely... start speaking" : "Message AI assistant..."}
-              className={`flex-1 px-5 py-3 rounded-full text-xs font-semibold outline-none transition duration-200 min-w-0 ${
-                theme === "dark"
-                  ? "bg-[#070B14] border border-white/5 text-white placeholder-gray-500 focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
-                  : "bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10"
-              }`}
-              disabled={audioFile || videoFile}
-            />
 
             {/* Circular Purple Gradient Send Button */}
             <button
               type="submit"
-              className="w-10 h-10 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-white hover:scale-105 active:scale-95 transition-all duration-100 flex items-center justify-center flex-shrink-0 cursor-pointer shadow-md shadow-purple-500/20"
+              className="w-10 h-10 flex-shrink-0 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-white hover:scale-105 active:scale-95 transition-all duration-100 flex items-center justify-center cursor-pointer shadow-md shadow-purple-500/20"
               title="Send message"
             >
               <svg viewBox="0 0 24 24" className="w-4 h-4 text-white fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

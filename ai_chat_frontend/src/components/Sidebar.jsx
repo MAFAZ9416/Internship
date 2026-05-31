@@ -375,10 +375,12 @@ export default function Sidebar({
       pl-4
       pr-12
       rounded-xl
-      bg-[#070B14]
+      outline-none
+      bg-bg-card
       border
-      border-white/5
-      text-white
+      border-border-primary
+      text-text-primary
+      placeholder-text-secondary
       "
       />
 
@@ -388,7 +390,7 @@ export default function Sidebar({
       right-4
       top-1/2
       -translate-y-1/2
-      text-gray-400
+      text-text-secondary
       pointer-events-none
       "
       />
@@ -406,7 +408,15 @@ export default function Sidebar({
         <h3 className="text-[10px] font-extrabold text-gray-500 px-3 py-1.5 tracking-widest uppercase select-none">
           📌 PINNED CHATS
         </h3>
-        <div style={{ borderBottom: '1px solid rgba(255,255,255,.08)' }} className="mt-1 mb-2 flex-shrink-0" />
+        <div
+          className="mt-1 mb-2 flex-shrink-0"
+          style={{
+            borderBottom:
+              theme === "dark"
+                ? "1px solid rgba(255,255,255,0.12)"
+                : "2px solid #94A3B8"
+          }}
+        />
         <div className="overflow-y-auto sidebar-scroll px-1 flex-1 flex flex-col gap-3 scroll-smooth">
           {filteredPinned.length > 0 ? (
             filteredPinned.map((c) => renderConversationItem(c, true, false))
@@ -421,7 +431,15 @@ export default function Sidebar({
         <h3 className="text-[10px] font-extrabold text-gray-500 px-3 py-1.5 tracking-widest uppercase select-none">
           🕒 RECENT CHATS
         </h3>
-        <div style={{ borderBottom: '1px solid rgba(255,255,255,.08)' }} className="mt-1 mb-2 flex-shrink-0" />
+        <div
+          className="mt-1 mb-2 flex-shrink-0"
+          style={{
+            borderBottom:
+              theme === "dark"
+                ? "1px solid rgba(255,255,255,0.12)"
+                : "2px solid #94A3B8"
+          }}
+        />
         <div className="overflow-y-auto sidebar-scroll px-1 flex-1 flex flex-col gap-3 scroll-smooth">
           {filteredRecent.length > 0 ? (
             filteredRecent.map((c) => renderConversationItem(c, false, false))
@@ -436,7 +454,15 @@ export default function Sidebar({
         <h3 className="text-[10px] font-extrabold text-gray-500 px-3 py-1.5 tracking-widest uppercase select-none">
           📦 ARCHIVED CHATS
         </h3>
-        <div style={{ borderBottom: '1px solid rgba(255,255,255,.08)' }} className="mt-1 mb-2 flex-shrink-0" />
+        <div
+          className="mt-1 mb-2 flex-shrink-0"
+          style={{
+            borderBottom:
+              theme === "dark"
+                ? "1px solid rgba(255,255,255,0.12)"
+                : "2px solid #94A3B8"
+          }}
+        />
         <div className="overflow-y-auto sidebar-scroll px-1 flex-1 flex flex-col gap-3 scroll-smooth">
           {filteredArchived.length > 0 ? (
             filteredArchived.map((c) => renderConversationItem(c, false, true))

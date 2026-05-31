@@ -116,20 +116,27 @@ export default function MessageBubble({
                     const fileUrl = file.preview || file.url || file.file;
                     const fileName = file.name || file.file_name || "Attachment";
 
+                    console.log("Attachment", file);
+
                     // IMAGE PREVIEW
-                    if (["png", "jpg", "jpeg", "webp", "gif"].includes(fileType) || fileType.startsWith("image/")) {
+                    if (fileType.startsWith("image/") || ["png", "jpg", "jpeg", "webp", "gif"].includes(fileType) || fileType.includes("image")) {
                       return (
-                        <div key={idx} className="relative group overflow-hidden rounded-xl border border-white/5 bg-black/10 max-w-sm select-none">
-                          <img
-                            src={fileUrl}
-                            alt={fileName}
-                            className="rounded-lg max-w-full max-h-[220px] object-cover transition-transform duration-200 group-hover:scale-102"
-                          />
-                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-150 flex items-center justify-center">
-                            <a href={fileUrl} target="_blank" rel="noreferrer" className="bg-white/20 backdrop-blur px-3 py-1 text-[10px] font-bold rounded-lg text-white">
-                              🔍 Open Image
-                            </a>
+                        <div key={idx} className="flex flex-col gap-1.5 select-none max-w-xs">
+                          <div className="relative group overflow-hidden rounded-xl border border-white/5 bg-black/10">
+                            <img
+                              src={file.url || file.file || file.preview}
+                              alt={file.name}
+                              className="rounded-xl max-w-xs object-cover border border-white/10"
+                            />
+                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-150 flex items-center justify-center">
+                              <a href={file.url || file.file || file.preview} target="_blank" rel="noreferrer" className="bg-white/20 backdrop-blur px-3 py-1 text-[10px] font-bold rounded-lg text-white">
+                                🔍 Open Image
+                              </a>
+                            </div>
                           </div>
+                          <p className="text-xs text-gray-400 mt-2">
+                            {file.name}
+                          </p>
                         </div>
                       );
                     }

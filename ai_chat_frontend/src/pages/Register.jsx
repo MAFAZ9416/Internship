@@ -360,33 +360,37 @@ export default function Register() {
                 <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Full Name</label>
                 <div className="relative w-full">
                   <FaUser
-                    className="
-                    absolute
-                    left-4
-                    top-1/2
-                    -translate-y-1/2
-                    text-gray-400
-                    pointer-events-none
-                    z-10
-                    "
+                    style={{
+                      position: 'absolute',
+                      left: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    className="text-gray-400 pointer-events-none z-10"
                   />
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter your full name"
-                    className="
+                    style={{
+                      paddingLeft: '48px',
+                      paddingRight: '48px',
+                    }}
+                    className={`
                     w-full
                     h-14
-                    pl-12
-                    pr-12
-                    bg-[#070B14]
-                    border
-                    border-white/10
-                    rounded-xl
-                    text-white
                     outline-none
-                    "
+                    border
+                    rounded-xl
+                    transition-colors
+                    duration-200
+                    ${
+                      theme === "dark"
+                        ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                        : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                    }
+                    `}
                   />
                 </div>
               </div>
@@ -396,33 +400,37 @@ export default function Register() {
                 <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Email</label>
                 <div className="relative w-full">
                   <FaEnvelope
-                    className="
-                    absolute
-                    left-4
-                    top-1/2
-                    -translate-y-1/2
-                    text-gray-400
-                    pointer-events-none
-                    z-10
-                    "
+                    style={{
+                      position: 'absolute',
+                      left: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    className="text-gray-400 pointer-events-none z-10"
                   />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="
+                    style={{
+                      paddingLeft: '48px',
+                      paddingRight: '48px',
+                    }}
+                    className={`
                     w-full
                     h-14
-                    pl-12
-                    pr-12
-                    bg-[#070B14]
-                    border
-                    border-white/10
-                    rounded-xl
-                    text-white
                     outline-none
-                    "
+                    border
+                    rounded-xl
+                    transition-colors
+                    duration-200
+                    ${
+                      theme === "dark"
+                        ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                        : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                    }
+                    `}
                   />
                 </div>
               </div>
@@ -432,44 +440,48 @@ export default function Register() {
                 <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Password</label>
                 <div className="relative w-full">
                   <FaLock
-                    className="
-                    absolute
-                    left-4
-                    top-1/2
-                    -translate-y-1/2
-                    text-gray-400
-                    pointer-events-none
-                    z-10
-                    "
+                    style={{
+                      position: 'absolute',
+                      left: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    className="text-gray-400 pointer-events-none z-10"
                   />
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Create a password"
-                    className="
+                    style={{
+                      paddingLeft: '48px',
+                      paddingRight: '48px',
+                    }}
+                    className={`
                     w-full
                     h-14
-                    pl-12
-                    pr-12
-                    bg-[#070B14]
-                    border
-                    border-white/10
-                    rounded-xl
-                    text-white
                     outline-none
-                    "
+                    border
+                    rounded-xl
+                    transition-colors
+                    duration-200
+                    ${
+                      theme === "dark"
+                        ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                        : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                    }
+                    `}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="
-                    absolute
-                    right-4
-                    top-1/2
-                    -translate-y-1/2
-                    z-20
-                    "
+                    style={{
+                      position: 'absolute',
+                      right: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    className="z-20 cursor-pointer flex items-center justify-center"
                   >
                     {showPassword ? <FaEyeSlash className="text-gray-400" /> : <FaEye className="text-gray-400" />}
                   </button>
@@ -481,44 +493,48 @@ export default function Register() {
                 <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Confirm Password</label>
                 <div className="relative w-full">
                   <FaLock
-                    className="
-                    absolute
-                    left-4
-                    top-1/2
-                    -translate-y-1/2
-                    text-gray-400
-                    pointer-events-none
-                    z-10
-                    "
+                    style={{
+                      position: 'absolute',
+                      left: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    className="text-gray-400 pointer-events-none z-10"
                   />
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm your password"
-                    className="
+                    style={{
+                      paddingLeft: '48px',
+                      paddingRight: '48px',
+                    }}
+                    className={`
                     w-full
                     h-14
-                    pl-12
-                    pr-12
-                    bg-[#070B14]
-                    border
-                    border-white/10
-                    rounded-xl
-                    text-white
                     outline-none
-                    "
+                    border
+                    rounded-xl
+                    transition-colors
+                    duration-200
+                    ${
+                      theme === "dark"
+                        ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                        : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                    }
+                    `}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="
-                    absolute
-                    right-4
-                    top-1/2
-                    -translate-y-1/2
-                    z-20
-                    "
+                    style={{
+                      position: 'absolute',
+                      right: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    className="z-20 cursor-pointer flex items-center justify-center"
                   >
                     {showConfirmPassword ? <FaEyeSlash className="text-gray-400" /> : <FaEye className="text-gray-400" />}
                   </button>
@@ -531,7 +547,9 @@ export default function Register() {
                   type="checkbox"
                   required
                   defaultChecked
-                  className="custom-checkbox rounded w-4 h-4 mt-0.5 cursor-pointer"
+                  className={`custom-checkbox rounded w-4 h-4 mt-0.5 cursor-pointer bg-transparent border ${
+                    theme === "dark" ? "border-white/10" : "border-slate-300"
+                  }`}
                 />
                 <span className={theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}>
                   I agree to the <a href="#terms" onClick={(e) => { e.preventDefault(); }} className="text-[#A855F7] hover:underline font-bold">Terms of Service</a> and <a href="#privacy" onClick={(e) => { e.preventDefault(); }} className="text-[#A855F7] hover:underline font-bold">Privacy Policy</a>
@@ -661,33 +679,37 @@ export default function Register() {
               <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Full Name</label>
               <div className="relative w-full">
                 <FaUser
-                  className="
-                  absolute
-                  left-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-400
-                  pointer-events-none
-                  z-10
-                  "
+                  style={{
+                    position: 'absolute',
+                    left: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  className="text-gray-400 pointer-events-none z-10"
                 />
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter your full name"
-                  className="
+                  style={{
+                    paddingLeft: '48px',
+                    paddingRight: '48px',
+                  }}
+                  className={`
                   w-full
                   h-14
-                  pl-12
-                  pr-12
-                  bg-[#070B14]
-                  border
-                  border-white/10
-                  rounded-xl
-                  text-white
                   outline-none
-                  "
+                  border
+                  rounded-xl
+                  transition-colors
+                  duration-200
+                  ${
+                    theme === "dark"
+                      ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                      : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                  }
+                  `}
                 />
               </div>
             </div>
@@ -697,33 +719,37 @@ export default function Register() {
               <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Email</label>
               <div className="relative w-full">
                 <FaEnvelope
-                  className="
-                  absolute
-                  left-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-400
-                  pointer-events-none
-                  z-10
-                  "
+                  style={{
+                    position: 'absolute',
+                    left: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  className="text-gray-400 pointer-events-none z-10"
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="
+                  style={{
+                    paddingLeft: '48px',
+                    paddingRight: '48px',
+                  }}
+                  className={`
                   w-full
                   h-14
-                  pl-12
-                  pr-12
-                  bg-[#070B14]
-                  border
-                  border-white/10
-                  rounded-xl
-                  text-white
                   outline-none
-                  "
+                  border
+                  rounded-xl
+                  transition-colors
+                  duration-200
+                  ${
+                    theme === "dark"
+                      ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                      : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                  }
+                  `}
                 />
               </div>
             </div>
@@ -733,44 +759,48 @@ export default function Register() {
               <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Password</label>
               <div className="relative w-full">
                 <FaLock
-                  className="
-                  absolute
-                  left-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-400
-                  pointer-events-none
-                  z-10
-                  "
+                  style={{
+                    position: 'absolute',
+                    left: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  className="text-gray-400 pointer-events-none z-10"
                 />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Create a password"
-                  className="
+                  style={{
+                    paddingLeft: '48px',
+                    paddingRight: '48px',
+                  }}
+                  className={`
                   w-full
                   h-14
-                  pl-12
-                  pr-12
-                  bg-[#070B14]
-                  border
-                  border-white/10
-                  rounded-xl
-                  text-white
                   outline-none
-                  "
+                  border
+                  rounded-xl
+                  transition-colors
+                  duration-200
+                  ${
+                    theme === "dark"
+                      ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                      : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                  }
+                  `}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="
-                  absolute
-                  right-4
-                  top-1/2
-                  -translate-y-1/2
-                  z-20
-                  "
+                  style={{
+                    position: 'absolute',
+                    right: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  className="z-20 cursor-pointer flex items-center justify-center"
                 >
                   {showPassword ? <FaEyeSlash className="text-gray-400" /> : <FaEye className="text-gray-400" />}
                 </button>
@@ -782,44 +812,48 @@ export default function Register() {
               <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Confirm Password</label>
               <div className="relative w-full">
                 <FaLock
-                  className="
-                  absolute
-                  left-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-400
-                  pointer-events-none
-                  z-10
-                  "
+                  style={{
+                    position: 'absolute',
+                    left: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  className="text-gray-400 pointer-events-none z-10"
                 />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your password"
-                  className="
+                  style={{
+                    paddingLeft: '48px',
+                    paddingRight: '48px',
+                  }}
+                  className={`
                   w-full
                   h-14
-                  pl-12
-                  pr-12
-                  bg-[#070B14]
-                  border
-                  border-white/10
-                  rounded-xl
-                  text-white
                   outline-none
-                  "
+                  border
+                  rounded-xl
+                  transition-colors
+                  duration-200
+                  ${
+                    theme === "dark"
+                      ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                      : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                  }
+                  `}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="
-                  absolute
-                  right-4
-                  top-1/2
-                  -translate-y-1/2
-                  z-20
-                  "
+                  style={{
+                    position: 'absolute',
+                    right: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  className="z-20 cursor-pointer flex items-center justify-center"
                 >
                   {showConfirmPassword ? <FaEyeSlash className="text-gray-400" /> : <FaEye className="text-gray-400" />}
                 </button>
@@ -828,7 +862,9 @@ export default function Register() {
 
             {/* Terms checkbox */}
             <div className="flex items-start gap-2 text-[10px] pt-1 leading-relaxed select-none">
-              <input type="checkbox" required defaultChecked className="custom-checkbox rounded w-3.5 h-3.5 mt-0.5" />
+              <input type="checkbox" required defaultChecked className={`custom-checkbox rounded w-3.5 h-3.5 mt-0.5 bg-transparent border ${
+                theme === "dark" ? "border-white/10" : "border-slate-300"
+              }`} />
               <span className={theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}>
                 I agree to the <a href="#terms" onClick={(e) => { e.preventDefault(); }} className="text-[#A855F7] font-bold">Terms</a> and <a href="#privacy" onClick={(e) => { e.preventDefault(); }} className="text-[#A855F7] font-bold">Privacy</a>
               </span>

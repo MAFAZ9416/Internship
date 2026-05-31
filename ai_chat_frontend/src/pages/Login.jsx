@@ -339,33 +339,37 @@ export default function Login() {
                 <label className={`block text-xs font-bold mb-2 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Email</label>
                 <div className="relative w-full">
                   <FaEnvelope
-                    className="
-                    absolute
-                    left-4
-                    top-1/2
-                    -translate-y-1/2
-                    text-gray-400
-                    pointer-events-none
-                    z-10
-                    "
+                    style={{
+                      position: 'absolute',
+                      left: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    className="text-gray-400 pointer-events-none z-10"
                   />
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter your email"
-                    className="
+                    style={{
+                      paddingLeft: '48px',
+                      paddingRight: '48px',
+                    }}
+                    className={`
                     w-full
                     h-14
-                    pl-12
-                    pr-12
-                    bg-[#070B14]
-                    border
-                    border-white/10
-                    rounded-xl
-                    text-white
                     outline-none
-                    "
+                    border
+                    rounded-xl
+                    transition-colors
+                    duration-200
+                    ${
+                      theme === "dark"
+                        ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                        : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                    }
+                    `}
                   />
                 </div>
               </div>
@@ -375,44 +379,48 @@ export default function Login() {
                 <label className={`block text-xs font-bold mb-2 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Password</label>
                 <div className="relative w-full">
                   <FaLock
-                    className="
-                    absolute
-                    left-4
-                    top-1/2
-                    -translate-y-1/2
-                    text-gray-400
-                    pointer-events-none
-                    z-10
-                    "
+                    style={{
+                      position: 'absolute',
+                      left: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    className="text-gray-400 pointer-events-none z-10"
                   />
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="
+                    style={{
+                      paddingLeft: '48px',
+                      paddingRight: '48px',
+                    }}
+                    className={`
                     w-full
                     h-14
-                    pl-12
-                    pr-12
-                    bg-[#070B14]
-                    border
-                    border-white/10
-                    rounded-xl
-                    text-white
                     outline-none
-                    "
+                    border
+                    rounded-xl
+                    transition-colors
+                    duration-200
+                    ${
+                      theme === "dark"
+                        ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                        : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                    }
+                    `}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="
-                    absolute
-                    right-4
-                    top-1/2
-                    -translate-y-1/2
-                    z-20
-                    "
+                    style={{
+                      position: 'absolute',
+                      right: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    className="z-20 cursor-pointer flex items-center justify-center"
                   >
                     {showPassword ? <FaEyeSlash className="text-gray-400" /> : <FaEye className="text-gray-400" />}
                   </button>
@@ -422,7 +430,7 @@ export default function Login() {
               {/* Keep Remember Me and Forgot password side by side */}
               <div className="flex items-center justify-between text-xs pt-1">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input type="checkbox" className="custom-checkbox rounded w-4 h-4 cursor-pointer bg-transparent border-white/10" />
+                  <input type="checkbox" className={`custom-checkbox rounded w-4 h-4 cursor-pointer bg-transparent border ${theme === 'dark' ? 'border-white/10' : 'border-slate-300'}`} />
                   <span className={theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}>Remember me</span>
                 </label>
                 <a 
@@ -549,33 +557,37 @@ export default function Login() {
               <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Email</label>
               <div className="relative w-full">
                 <FaEnvelope
-                  className="
-                  absolute
-                  left-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-400
-                  pointer-events-none
-                  z-10
-                  "
+                  style={{
+                    position: 'absolute',
+                    left: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  className="text-gray-400 pointer-events-none z-10"
                 />
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter your email"
-                  className="
+                  style={{
+                    paddingLeft: '48px',
+                    paddingRight: '48px',
+                  }}
+                  className={`
                   w-full
                   h-14
-                  pl-12
-                  pr-12
-                  bg-[#070B14]
-                  border
-                  border-white/10
-                  rounded-xl
-                  text-white
                   outline-none
-                  "
+                  border
+                  rounded-xl
+                  transition-colors
+                  duration-200
+                  ${
+                    theme === "dark"
+                      ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                      : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                  }
+                  `}
                 />
               </div>
             </div>
@@ -585,44 +597,48 @@ export default function Login() {
               <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Password</label>
               <div className="relative w-full">
                 <FaLock
-                  className="
-                  absolute
-                  left-4
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-400
-                  pointer-events-none
-                  z-10
-                  "
+                  style={{
+                    position: 'absolute',
+                    left: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  className="text-gray-400 pointer-events-none z-10"
                 />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="
+                  style={{
+                    paddingLeft: '48px',
+                    paddingRight: '48px',
+                  }}
+                  className={`
                   w-full
                   h-14
-                  pl-12
-                  pr-12
-                  bg-[#070B14]
-                  border
-                  border-white/10
-                  rounded-xl
-                  text-white
                   outline-none
-                  "
+                  border
+                  rounded-xl
+                  transition-colors
+                  duration-200
+                  ${
+                    theme === "dark"
+                      ? "bg-[#070B14] text-white border-white/10 placeholder:text-slate-400"
+                      : "bg-white text-slate-900 border-slate-300 placeholder:text-slate-500"
+                  }
+                  `}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="
-                  absolute
-                  right-4
-                  top-1/2
-                  -translate-y-1/2
-                  z-20
-                  "
+                  style={{
+                    position: 'absolute',
+                    right: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}
+                  className="z-20 cursor-pointer flex items-center justify-center"
                 >
                   {showPassword ? <FaEyeSlash className="text-gray-400" /> : <FaEye className="text-gray-400" />}
                 </button>
