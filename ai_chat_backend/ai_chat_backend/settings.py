@@ -1,7 +1,11 @@
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 import os
+
+# Load environment variables early
+load_dotenv()
 
 # ==========================
 # BASE DIRECTORY
@@ -13,15 +17,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # ==========================
 
-SECRET_KEY = "django-insecure-(fcfvlb=zi*heq91m^yt)g-vj*+-rpq$obzxfvn3x#wo7cqjo4"
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ImproperlyConfigured("The SECRET_KEY environment variable must be set.")
 
-DEBUG = False
+DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".onrender.com",
-    "novaai-6001.onrender.com",
+    host.strip()
+    for host in os.getenv(
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1,.onrender.com"
+    ).split(",")
+    if host.strip()
 ]
 
 # ==========================
@@ -41,6 +49,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
 
     # Local Apps
@@ -179,16 +188,19 @@ SIMPLE_JWT = {
 # ENVIRONMENT VARIABLES
 # ==========================
 
-load_dotenv()
-
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # ==========================
 # CORS SETTINGS
 # ==========================
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOW_CREDENTIALS = True
 
 # ==========================
@@ -196,7 +208,9 @@ CORS_ALLOW_CREDENTIALS = True
 # ==========================
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://novaai-lac.vercel.app",
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
 ]
 
 # ==========================

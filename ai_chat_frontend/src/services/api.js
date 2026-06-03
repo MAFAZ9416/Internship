@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const BASE_URL = "https://novaai-6001.onrender.com/api";
+const API_BASE = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") || "https://novaai-60e1.onrender.com";
+export const BASE_URL = API_BASE.endsWith("/api") ? API_BASE : `${API_BASE}/api`;
+export const API_HOST = BASE_URL.replace(/\/api$/, "");
 
 const api = axios.create({
   baseURL: BASE_URL,

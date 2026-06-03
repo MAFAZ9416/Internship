@@ -18,6 +18,12 @@ urlpatterns = [
         name="edit-message"
     ),
 
+    path(
+        "history/messages/<int:id>/",
+        DeleteMessageView.as_view(),
+        name="delete-message"
+    ),
+
     # File Upload
     path(
         "upload/",

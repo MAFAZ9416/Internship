@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import api, { apiMethods } from "../services/api";
+import api, { apiMethods, API_HOST } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 import Sidebar from "../components/Sidebar";
@@ -43,6 +43,12 @@ export default function Chat() {
   const [isVoiceListening, setIsVoiceListening] = useState(false);
 
   const { user, logout } = useAuth();
+
+  const getAbsoluteUrl = (filePath) => {
+    if (!filePath) return filePath;
+    if (filePath.startsWith("http")) return filePath;
+    return `${API_HOST.replace(/\/$/, "")}${filePath.startsWith("/") ? "" : "/"}${filePath}`;
+  };
 
   const initials = useMemo(() => {
     if (!user?.username) return "AI";
@@ -426,9 +432,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
             ...msg,
             files:
               msg.files?.map((file) => {
-                const fileUrl = file.file?.startsWith("http")
-                  ? file.file
-                  : `http://127.0.0.1:8000${file.file}`;
+                const fileUrl = getAbsoluteUrl(file.file || file.url || file.preview);
                 return {
                   id: file.id,
                   name: file.file_name || file.name,
@@ -491,9 +495,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
           ...msg,
           files:
             msg.files?.map((file) => {
-              const fileUrl = file.file?.startsWith("http")
-                ? file.file
-                : `http://127.0.0.1:8000${file.file}`;
+              const fileUrl = getAbsoluteUrl(file.file || file.url || file.preview);
               return {
                 id: file.id,
                 name: file.file_name || file.name,
@@ -599,7 +601,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
     const newName = prompt("Rename conversation to:", currentChatTitle);
     if (!newName?.trim() || newName === currentChatTitle) return;
     try {
-      await api.patch(`history/${currentConversationId}/rename/`, {
+      await api.patch(`/history/${currentConversationId}/rename/`, {
         title: newName
       });
       fetchConversations();
@@ -614,7 +616,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
     const newName = prompt("Rename conversation to:", currentTitle);
     if (!newName?.trim() || newName === currentTitle) return;
     try {
-      await api.patch(`history/${id}/rename/`, {
+      await api.patch(`/history/${id}/rename/`, {
         title: newName
       });
       fetchConversations();

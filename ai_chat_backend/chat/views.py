@@ -8,12 +8,26 @@ from django.utils import timezone
 from django.db.models import Q
 import mimetypes
 import os
+import tempfile
 
 from .models import *
 from .serializers import *
 
 import google.generativeai as genai
 from django.conf import settings
+
+
+def _prepare_temp_file(uploaded_file):
+    if hasattr(uploaded_file, "temporary_file_path"):
+        return uploaded_file.temporary_file_path(), False
+
+    suffix = os.path.splitext(uploaded_file.name)[1]
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    for chunk in uploaded_file.chunks():
+        temp_file.write(chunk)
+    temp_file.flush()
+    temp_file.close()
+    return temp_file.name, True
 
 
 # Configure Gemini
@@ -54,23 +68,19 @@ class ChatAPIView(APIView):
 
 
             if conversation_id:
-
-                conversation=Conversation.objects.get(
-
-                    id=conversation_id,
-
-                    user=request.user
-
-                )
-
+                try:
+                    conversation=Conversation.objects.get(
+                        id=conversation_id,
+                        user=request.user
+                    )
+                except Conversation.DoesNotExist:
+                    return Response({
+                        "error": "Conversation not found"
+                    }, status=404)
             else:
-
                 conversation=Conversation.objects.create(
-
                     user=request.user,
-
                     title=user_message[:30]
-
                 )
 
 
@@ -256,7 +266,8 @@ class ConversationHistoryView(APIView):
                     "content": msg.content,
                     "files": UploadedFileSerializer(
                         UploadedFile.objects.filter(message=msg),
-                        many=True
+                        many=True,
+                        context={"request": request}
                     ).data
                 })
 
@@ -270,7 +281,8 @@ class ConversationHistoryView(APIView):
 
                 "uploaded_files": UploadedFileSerializer(
                     UploadedFile.objects.filter(message__conversation=conversation),
-                    many=True
+                    many=True,
+                    context={"request": request}
                 ).data
 
             })
@@ -323,6 +335,31 @@ class DeleteConversationView(APIView):
 
             },status=404)
 
+
+# ==========================
+# DELETE MESSAGE
+# ==========================
+
+class DeleteMessageView(APIView):
+
+    permission_classes=[IsAuthenticated]
+
+    def delete(self, request, id):
+        try:
+            message = Message.objects.get(id=id)
+            if message.conversation.user != request.user:
+                return Response({
+                    "error": "Unauthorized"
+                }, status=403)
+
+            message.delete()
+            return Response({
+                "message": "Message deleted"
+            })
+        except Message.DoesNotExist:
+            return Response({
+                "error": "Message not found"
+            }, status=404)
 
 
 # ==========================
@@ -934,10 +971,15 @@ class AudioTranscribeView(APIView):
                 import google.generativeai as genai
 
                 # Upload file to Gemini
-                genai_file = genai.upload_file(
-                    path=audio_file.temporary_file_path(),
-                    mime_type=mime_type
-                )
+                temp_path, cleanup = _prepare_temp_file(audio_file)
+                try:
+                    genai_file = genai.upload_file(
+                        path=temp_path,
+                        mime_type=mime_type
+                    )
+                finally:
+                    if cleanup and os.path.exists(temp_path):
+                        os.remove(temp_path)
 
                 # Create transcription prompt
                 model = genai.GenerativeModel("gemini-2.0-flash")
@@ -1027,6 +1069,8 @@ class VideoProcessView(APIView):
             conversation_id = request.data.get('conversation_id')
             user_message_text = request.data.get('message', '')
             extract_audio = request.data.get('extract_audio', True)
+            if isinstance(extract_audio, str):
+                extract_audio = extract_audio.lower() in ("1", "true", "yes", "on")
 
             if not conversation_id:
                 return Response({
@@ -1089,10 +1133,15 @@ class VideoProcessView(APIView):
                 import google.generativeai as genai
 
                 # Upload video to Gemini
-                genai_file = genai.upload_file(
-                    path=video_file.temporary_file_path(),
-                    mime_type=mime_type
-                )
+                temp_path, cleanup = _prepare_temp_file(video_file)
+                try:
+                    genai_file = genai.upload_file(
+                        path=temp_path,
+                        mime_type=mime_type
+                    )
+                finally:
+                    if cleanup and os.path.exists(temp_path):
+                        os.remove(temp_path)
 
                 model = genai.GenerativeModel("gemini-2.0-flash")
 
