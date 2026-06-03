@@ -181,6 +181,8 @@ CORS_ALLOWED_ORIGINS=[
     "http://127.0.0.1:5174",
     "http://127.0.0.1:5175",
 
+    "https://novaai-lac.vercel.app",
+
 ]
 
 CORS_ALLOW_CREDENTIALS=True
