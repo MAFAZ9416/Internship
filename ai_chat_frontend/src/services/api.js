@@ -1,127 +1,78 @@
 import axios from "axios";
 
+const BASE_URL = "https://novaai-6001.onrender.com/api";
+
 const api = axios.create({
-    baseURL: "http://127.0.0.1:8000/api",
+  baseURL: BASE_URL,
 });
 
-
-
 api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access");
 
-(config)=>{
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
-const token=
-localStorage.getItem(
-"access"
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
-
-if(token){
-
-config.headers.Authorization=
-`Bearer ${token}`;
-
-}
-
-return config;
-
-},
-
-(error)=>Promise.reject(error)
-
-);
-
-
-
 
 api.interceptors.response.use(
+  (response) => response,
 
-(response)=>response,
+  async (error) => {
+    const originalRequest = error.config;
 
-async(error)=>{
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
 
-const originalRequest=
-error.config;
+      try {
+        const refreshToken =
+          localStorage.getItem("refresh");
 
-if(
+        if (!refreshToken) {
+          throw new Error("No refresh token");
+        }
 
-error.response?.status===401 &&
-!originalRequest._retry
+        const response = await axios.post(
+          `${BASE_URL}/auth/token/refresh/`,
+          {
+            refresh: refreshToken,
+          }
+        );
 
-){
+        const newAccess = response.data.access;
 
-originalRequest._retry=true;
+        localStorage.setItem(
+          "access",
+          newAccess
+        );
 
-try{
+        originalRequest.headers.Authorization =
+          `Bearer ${newAccess}`;
 
-const refreshToken=
-localStorage.getItem(
-"refresh"
-);
+        return api(originalRequest);
+      } catch (err) {
+        console.log("Session expired");
 
-if(!refreshToken){
+        localStorage.clear();
 
-throw new Error(
-"No refresh token"
-);
+        window.location.href = "/login";
 
-}
+        return Promise.reject(err);
+      }
+    }
 
-const response=
-await axios.post(
-
-"http://127.0.0.1:8000/api/auth/token/refresh/",
-
-{
-refresh:refreshToken
-}
-
-);
-
-const newAccess=
-response.data.access;
-
-localStorage.setItem(
-
-"access",
-
-newAccess
-
-);
-
-originalRequest.headers.Authorization=
-`Bearer ${newAccess}`;
-
-return api(
-originalRequest
-);
-
-}
-
-catch(err){
-
-console.log(
-"Session expired"
-);
-
-localStorage.clear();
-
-window.location.href=
-"/login";
-
-return Promise.reject(err);
-
-}
-
-}
-
-return Promise.reject(error);
-
-}
-
+    return Promise.reject(error);
+  }
 );
 
 export default api;
-
 
 // ==========================
 // API ENDPOINTS HELPER
@@ -162,73 +113,131 @@ export const apiEndpoints = {
   logout: () => "/auth/logout/",
 };
 
-
 // ==========================
 // API METHODS HELPER
 // ==========================
 
 export const apiMethods = {
-  // Pinned chats
   pin: async (conversationId) => {
-    return api.post(apiEndpoints.pinConversation(conversationId));
+    return api.post(
+      apiEndpoints.pinConversation(conversationId)
+    );
   },
 
   unpin: async (conversationId) => {
-    return api.post(apiEndpoints.unpinConversation(conversationId));
+    return api.post(
+      apiEndpoints.unpinConversation(conversationId)
+    );
   },
 
-  // Search archived
   searchArchived: async (query) => {
-    return api.get(apiEndpoints.searchArchived(), {
-      params: { q: query }
-    });
+    return api.get(
+      apiEndpoints.searchArchived(),
+      {
+        params: { q: query },
+      }
+    );
   },
 
-  // Audio transcription
-  transcribeAudio: async (audioFile, conversationId, message = "") => {
+  transcribeAudio: async (
+    audioFile,
+    conversationId,
+    message = ""
+  ) => {
     const formData = new FormData();
-    formData.append("audio_file", audioFile);
-    formData.append("conversation_id", conversationId);
+
+    formData.append(
+      "audio_file",
+      audioFile
+    );
+
+    formData.append(
+      "conversation_id",
+      conversationId
+    );
+
     if (message) {
-      formData.append("message", message);
+      formData.append(
+        "message",
+        message
+      );
     }
 
-    return api.post(apiEndpoints.transcribeAudio(), formData, {
-      headers: {
-        "Content-Type": "multipart/form-data"
+    return api.post(
+      apiEndpoints.transcribeAudio(),
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data",
+        },
       }
-    });
+    );
   },
 
-  // Video processing
-  processVideo: async (videoFile, conversationId, message = "", extractAudio = true) => {
+  processVideo: async (
+    videoFile,
+    conversationId,
+    message = "",
+    extractAudio = true
+  ) => {
     const formData = new FormData();
-    formData.append("video_file", videoFile);
-    formData.append("conversation_id", conversationId);
-    formData.append("extract_audio", extractAudio);
+
+    formData.append(
+      "video_file",
+      videoFile
+    );
+
+    formData.append(
+      "conversation_id",
+      conversationId
+    );
+
+    formData.append(
+      "extract_audio",
+      extractAudio
+    );
+
     if (message) {
-      formData.append("message", message);
+      formData.append(
+        "message",
+        message
+      );
     }
 
-    return api.post(apiEndpoints.processVideo(), formData, {
-      headers: {
-        "Content-Type": "multipart/form-data"
+    return api.post(
+      apiEndpoints.processVideo(),
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data",
+        },
       }
-    });
+    );
   },
 
-  // Delete conversation
   delete: async (conversationId) => {
-    return api.delete(apiEndpoints.deleteConversation(conversationId));
+    return api.delete(
+      apiEndpoints.deleteConversation(
+        conversationId
+      )
+    );
   },
 
-  // Archive conversation
   archive: async (conversationId) => {
-    return api.post(apiEndpoints.archiveConversation(conversationId));
+    return api.post(
+      apiEndpoints.archiveConversation(
+        conversationId
+      )
+    );
   },
 
-  // Restore conversation
   restore: async (conversationId) => {
-    return api.post(apiEndpoints.restoreConversation(conversationId));
-  }
+    return api.post(
+      apiEndpoints.restoreConversation(
+        conversationId
+      )
+    );
+  },
 };
