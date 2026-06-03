@@ -21,7 +21,7 @@ urlpatterns = [
     ),
 
     path(
-        '',
+        'api/',
         include('chat.urls')
     ),
 
