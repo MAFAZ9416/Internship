@@ -21,15 +21,12 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
     raise ImproperlyConfigured("The SECRET_KEY environment variable must be set.")
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv(
-        "ALLOWED_HOSTS",
-        "localhost,127.0.0.1,.onrender.com"
-    ).split(",")
-    if host.strip()
+    "novaai-60e1.onrender.com",
+    "localhost",
+    "127.0.0.1:8000",
 ]
 
 # ==========================
