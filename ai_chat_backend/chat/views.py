@@ -160,13 +160,12 @@ User:
 
 
             except Exception as e:
-
-                print(
-                    "GEMINI ERROR:",
-                    e
-                )
-
-                ai_text=f"AI Error: {str(e)}"
+                print("GEMINI ERROR:", e)
+                error_str = str(e)
+                if any(term in error_str for term in ["429", "RESOURCE_EXHAUSTED", "Quota exceeded"]):
+                    ai_text = "We've reached today's AI usage limit. Please try again later."
+                else:
+                    ai_text = "An unexpected AI error occurred. Please try again."
 
 
 
@@ -752,14 +751,12 @@ class EditMessageView(APIView):
                 ai_text = response.text
 
             except Exception as e:
-
                 print(f"Gemini Error: {e}")
-
-                ai_text = f"""
-AI Service Error:
-
-{str(e)}
-"""
+                error_str = str(e)
+                if any(term in error_str for term in ["429", "RESOURCE_EXHAUSTED", "Quota exceeded"]):
+                    ai_text = "We've reached today's AI usage limit. Please try again later."
+                else:
+                    ai_text = "An unexpected AI error occurred. Please try again."
 
             # Create new AI response message
             new_ai_message = Message.objects.create(
@@ -1012,7 +1009,11 @@ class AudioTranscribeView(APIView):
 
                 except Exception as e:
                     print(f"Gemini Error: {e}")
-                    ai_text = f"AI Processing Error: {str(e)}"
+                    error_str = str(e)
+                    if any(term in error_str for term in ["429", "RESOURCE_EXHAUSTED", "Quota exceeded"]):
+                        ai_text = "We've reached today's AI usage limit. Please try again later."
+                    else:
+                        ai_text = "An unexpected AI error occurred. Please try again."
 
                 # Save AI response
                 ai_msg = Message.objects.create(
@@ -1195,7 +1196,11 @@ class VideoProcessView(APIView):
 
                 except Exception as e:
                     print(f"AI Response Error: {e}")
-                    ai_text = f"AI Processing Error: {str(e)}"
+                    error_str = str(e)
+                    if any(term in error_str for term in ["429", "RESOURCE_EXHAUSTED", "Quota exceeded"]):
+                        ai_text = "We've reached today's AI usage limit. Please try again later."
+                    else:
+                        ai_text = "An unexpected AI error occurred. Please try again."
 
                 # Save AI response
                 ai_msg = Message.objects.create(

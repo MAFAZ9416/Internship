@@ -171,7 +171,7 @@ export default function Chat() {
 
   const fetchConversations = useCallback(async () => {
     try {
-      const response = await api.get("/history/");
+      const response = await api.get("history/");
       const history = Array.isArray(response.data)
         ? response.data
         : response.data.results || [];
@@ -231,7 +231,7 @@ export default function Chat() {
         payload.conversation_id = conversationId;
       }
 
-      const response = await api.post("/", payload);
+      const response = await api.post("", payload);
       conversationId = response.data.conversation_id;
 
       if (conversationId) {
@@ -246,7 +246,7 @@ export default function Chat() {
         });
         formData.append("conversation_id", conversationId);
 
-        await api.post("/upload/", formData, {
+        await api.post("upload/", formData, {
           headers: {
             "Content-Type": "multipart/form-data"
           },
@@ -267,7 +267,8 @@ export default function Chat() {
         id: response.data.ai_message_id || Date.now() + 1,
         role: "assistant",
         content: response.data.response || "No response",
-        timestamp: new Date()
+        timestamp: new Date(),
+        isNew: true
       };
 
       setMessages((prev) => {
@@ -295,7 +296,7 @@ export default function Chat() {
     if (!currentConversationId) {
       try {
         const payload = { message: message || "Audio message" };
-        const response = await api.post("/", payload);
+        const response = await api.post("", payload);
         setCurrentConversationId(response.data.conversation_id);
       } catch (error) {
         console.log("Error creating conversation:", error);
@@ -323,7 +324,8 @@ export default function Chat() {
         id: response.data.ai_message_id || Date.now() + 1,
         role: "assistant",
         content: response.data.response,
-        timestamp: new Date()
+        timestamp: new Date(),
+        isNew: true
       };
 
       setMessages((prev) => [...prev, transcriptMessage, aiMessage]);
@@ -341,7 +343,7 @@ export default function Chat() {
     if (!currentConversationId) {
       try {
         const payload = { message: message || "Video message" };
-        const response = await api.post("/", payload);
+        const response = await api.post("", payload);
         setCurrentConversationId(response.data.conversation_id);
       } catch (error) {
         console.log("Error creating conversation:", error);
@@ -374,7 +376,8 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
         id: response.data.ai_message_id || Date.now() + 1,
         role: "assistant",
         content: response.data.response,
-        timestamp: new Date()
+        timestamp: new Date(),
+        isNew: true
       };
 
       setMessages((prev) => [...prev, videoMessage, aiMessage]);
@@ -388,6 +391,12 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
   };
 
   const editMessage = async (messageId, newContent) => {
+    // Prevent editing if message hasn't received a DB ID yet (timestamp ID)
+    if (typeof messageId === 'number' && messageId > 1000000000000) {
+      alert("Please wait for the message to finish sending before editing.");
+      return;
+    }
+
     const previousMessages = [...messages];
 
     // Optimistically update local message state immediately
@@ -405,7 +414,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
     );
 
     try {
-      const response = await api.patch(`/message/${messageId}/edit/`, {
+      const response = await api.patch(`message/${messageId}/edit/`, {
         content: newContent
       });
 
@@ -426,7 +435,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
       );
 
       if (currentConversationId) {
-        const refreshed = await api.get(`/history/${currentConversationId}/`);
+        const refreshed = await api.get(`history/${currentConversationId}/`);
         const formattedMessages = (refreshed.data.messages || []).map(
           (msg) => ({
             ...msg,
@@ -455,16 +464,28 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
   };
 
   const deleteMessage = async (messageId) => {
+    // Prevent deleting if message hasn't received a DB ID yet
+    if (typeof messageId === 'number' && messageId > 1000000000000) {
+      alert("Please wait for the message to finish sending before deleting.");
+      return;
+    }
+
     if (!confirm("Are you sure you want to delete this message?")) return;
     setMessages(prev => prev.filter(msg => msg.id !== messageId));
     try {
-      await api.delete(`/history/messages/${messageId}/`);
+      await api.delete(`history/messages/${messageId}/`);
     } catch (e) {
       console.log("Backend message delete:", e);
     }
   };
 
   const regenerateMessage = async (messageId) => {
+    // Prevent regenerating if message hasn't received a DB ID yet
+    if (typeof messageId === 'number' && messageId > 1000000000000) {
+      alert("Please wait for the message to finish sending before regenerating.");
+      return;
+    }
+
     const index = messages.findIndex(msg => msg.id === messageId);
     if (index === -1) return;
 
@@ -489,7 +510,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
     setCurrentConversationId(id);
     localStorage.setItem("currentConversationId", id);
     try {
-      const response = await api.get(`/history/${id}/`);
+      const response = await api.get(`history/${id}/`);
       const formattedMessages = (response.data.messages || []).map(
         (msg) => ({
           ...msg,
@@ -516,13 +537,19 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
       }
     } catch (error) {
       console.log("Fetch conversation error:", error);
+      if (error.response && error.response.status === 404) {
+        setCurrentConversationId(null);
+        localStorage.removeItem("currentConversationId");
+        setMessages([]);
+        setUploadedFiles([]);
+      }
     }
   };
 
   const deleteConversation = async (id) => {
     if (!confirm("Are you sure you want to delete this chat permanently?")) return;
     try {
-      await api.delete(`/history/${id}/delete/`);
+      await api.delete(`history/${id}/delete/`);
       if (id === currentConversationId) {
         setCurrentConversationId(null);
         localStorage.removeItem("currentConversationId");
@@ -537,7 +564,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
 
   const archiveConversation = async (id) => {
     try {
-      await api.post(`/history/${id}/archive/`);
+      await api.post(`history/${id}/archive/`);
       fetchConversations();
       if (id === currentConversationId) {
         setCurrentConversationId(null);
@@ -552,7 +579,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
 
   const restoreConversation = async (id) => {
     try {
-      await api.post(`/history/${id}/restore/`);
+      await api.post(`history/${id}/restore/`);
       fetchConversations();
     } catch (error) {
       console.log("Restore error:", error);
@@ -561,7 +588,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
 
   const pinConversation = async (id) => {
     try {
-      await api.post(`/history/${id}/pin/`);
+      await api.post(`history/${id}/pin/`);
       fetchConversations();
     } catch (error) {
       console.log("Pin error:", error);
@@ -570,7 +597,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
 
   const unpinConversation = async (id) => {
     try {
-      await api.post(`/history/${id}/unpin/`);
+      await api.post(`history/${id}/unpin/`);
       fetchConversations();
     } catch (error) {
       console.log("Unpin error:", error);
@@ -601,7 +628,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
     const newName = prompt("Rename conversation to:", currentChatTitle);
     if (!newName?.trim() || newName === currentChatTitle) return;
     try {
-      await api.patch(`/history/${currentConversationId}/rename/`, {
+      await api.patch(`history/${currentConversationId}/rename/`, {
         title: newName
       });
       fetchConversations();
@@ -616,7 +643,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
     const newName = prompt("Rename conversation to:", currentTitle);
     if (!newName?.trim() || newName === currentTitle) return;
     try {
-      await api.patch(`/history/${id}/rename/`, {
+      await api.patch(`history/${id}/rename/`, {
         title: newName
       });
       fetchConversations();
@@ -906,18 +933,18 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
           /* MOBILE REDESIGNED CHAT VIEWPORT */
           <div className="flex-1 overflow-hidden flex flex-col bg-transparent relative pb-[72px]">
             
-            {/* If no conversation is active: show Welcome Screen inside main chat container */}
-            {!currentConversationId ? (
+            {/* If no conversation is active and no messages: show Welcome Screen inside main chat container */}
+            {!currentConversationId && messages.length === 0 ? (
               <div className="flex-1 overflow-y-auto">
                 <ChatWindow
-                  messages={[]}
-                  isTyping={false}
+                  messages={messages}
+                  isTyping={isTyping}
                   onEditMessage={() => {}}
                   onSendSuggestion={sendMessage}
                 />
               </div>
             ) : (
-              /* If conversation is active: show premium top selector card, messages, and input */
+              /* If conversation is active or starting: show premium top selector card, messages, and input */
               <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Premium Mobile Conversation Selector Card */}
                 <div className="p-3.5 flex-shrink-0">

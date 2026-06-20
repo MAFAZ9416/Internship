@@ -27,11 +27,45 @@ export default function MessageBubble({
   const theme = localStorage.getItem("theme") || "dark";
   const content = message.content || "";
 
+  // Typing effect state
+  const [displayedText, setDisplayedText] = useState((!isUser && message.isNew) ? "" : content);
+  const [isTypingAnimation, setIsTypingAnimation] = useState(!isUser && message.isNew);
+
   React.useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  React.useEffect(() => {
+    if (!isUser && message.isNew) {
+      setIsTypingAnimation(true);
+      setDisplayedText("");
+      let currentIndex = 0;
+      const fullText = content || "";
+      
+      const interval = setInterval(() => {
+        if (currentIndex < fullText.length - 1) {
+          currentIndex++;
+          setDisplayedText(fullText.slice(0, currentIndex));
+          window.dispatchEvent(new Event("chat-scroll"));
+        } else {
+          setDisplayedText(fullText);
+          clearInterval(interval);
+          setIsTypingAnimation(false);
+          message.isNew = false; // Prevent re-animation if component remounts
+          window.dispatchEvent(new Event("chat-scroll"));
+        }
+      }, 15);
+
+      return () => {
+        clearInterval(interval);
+      };
+    } else {
+      setDisplayedText(content);
+      setIsTypingAnimation(false);
+    }
+  }, [content, isUser, message.isNew]);
 
   React.useEffect(() => {
     setEditedText(content);
@@ -171,7 +205,8 @@ export default function MessageBubble({
                 {/* Message text */}
                 {content && (
                   <p className="text-[11px] font-medium whitespace-pre-wrap leading-relaxed">
-                    {content}
+                    {displayedText}
+                    {isTypingAnimation && <span className="animate-pulse">▌</span>}
                   </p>
                 )}
               </>
@@ -412,7 +447,8 @@ export default function MessageBubble({
               {/* Message text */}
               {content && (
                 <p className="text-xs font-semibold whitespace-pre-wrap leading-relaxed tracking-wide">
-                  {content}
+                  {displayedText}
+                  {isTypingAnimation && <span className="animate-pulse">▌</span>}
                 </p>
               )}
             </>

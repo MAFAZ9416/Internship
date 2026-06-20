@@ -137,7 +137,7 @@ export default function Sidebar({
     if (!newName?.trim()) return;
 
     try {
-      await api.patch(`/history/${id}/rename/`, {
+      await api.patch(`history/${id}/rename/`, {
         title: newName
       });
       window.location.reload();

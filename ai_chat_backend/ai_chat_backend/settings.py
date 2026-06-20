@@ -26,7 +26,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     "novaai-60e1.onrender.com",
     "localhost",
-    "127.0.0.1:8000",
+    "127.0.0.1",
 ]
 
 # ==========================
@@ -191,13 +191,16 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # ==========================
 
 CORS_ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv(
-        "CORS_ALLOWED_ORIGINS",
-        ""
-    ).split(",")
-    if origin.strip()
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://novaai-lake.vercel.app",
 ]
+
+env_cors = os.getenv("CORS_ALLOWED_ORIGINS", "")
+if env_cors:
+    CORS_ALLOWED_ORIGINS.extend([
+        origin.strip() for origin in env_cors.split(",") if origin.strip()
+    ])
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 
@@ -208,13 +211,17 @@ CORS_ALLOW_CREDENTIALS = True
 # ==========================
 
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv(
-        "CSRF_TRUSTED_ORIGINS",
-        ""
-    ).split(",")
-    if origin.strip()
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://novaai-lake.vercel.app",
+    "https://novaai-60e1.onrender.com",
 ]
+
+env_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", "")
+if env_csrf:
+    CSRF_TRUSTED_ORIGINS.extend([
+        origin.strip() for origin in env_csrf.split(",") if origin.strip()
+    ])
 # ==========================
 # RENDER SSL SUPPORT
 # ==========================

@@ -1,8 +1,9 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") || "https://novaai-60e1.onrender.com";
-export const BASE_URL = API_BASE.endsWith("/api") ? API_BASE : `${API_BASE}/api`;
-export const API_HOST = BASE_URL.replace(/\/api$/, "");
+const DEFAULT_BACKEND = import.meta.env.DEV ? "http://127.0.0.1:8000" : "https://novaai-60e1.onrender.com";
+const API_BASE = (import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") || DEFAULT_BACKEND);
+export const BASE_URL = API_BASE.endsWith("/api") ? `${API_BASE}/` : `${API_BASE}/api/`;
+export const API_HOST = BASE_URL.replace(/\/api\/$/, "");
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -42,7 +43,7 @@ api.interceptors.response.use(
         }
 
         const response = await axios.post(
-          `${BASE_URL}/auth/token/refresh/`,
+          `${BASE_URL}auth/token/refresh/`,
           {
             refresh: refreshToken,
           }
@@ -82,37 +83,37 @@ export default api;
 
 export const apiEndpoints = {
   // Chat
-  sendMessage: () => "/",
-  editMessage: (id) => `/message/${id}/edit/`,
+  sendMessage: () => "",
+  editMessage: (id) => `message/${id}/edit/`,
 
   // Conversations
-  getHistory: () => "/history/",
-  getConversation: (id) => `/history/${id}/`,
-  deleteConversation: (id) => `/history/${id}/delete/`,
-  renameConversation: (id) => `/history/${id}/rename/`,
-  archiveConversation: (id) => `/history/${id}/archive/`,
-  restoreConversation: (id) => `/history/${id}/restore/`,
+  getHistory: () => "history/",
+  getConversation: (id) => `history/${id}/`,
+  deleteConversation: (id) => `history/${id}/delete/`,
+  renameConversation: (id) => `history/${id}/rename/`,
+  archiveConversation: (id) => `history/${id}/archive/`,
+  restoreConversation: (id) => `history/${id}/restore/`,
 
   // Pinned Chats
-  pinConversation: (id) => `/history/${id}/pin/`,
-  unpinConversation: (id) => `/history/${id}/unpin/`,
+  pinConversation: (id) => `history/${id}/pin/`,
+  unpinConversation: (id) => `history/${id}/unpin/`,
 
   // Search
-  searchArchived: () => "/history/archived/search/",
+  searchArchived: () => "history/archived/search/",
 
   // File Upload
-  uploadFiles: () => "/upload/",
-  transcribeAudio: () => "/upload/audio/transcribe/",
-  processVideo: () => "/upload/video/process/",
+  uploadFiles: () => "upload/",
+  transcribeAudio: () => "upload/audio/transcribe/",
+  processVideo: () => "upload/video/process/",
 
   // Models
-  getModels: () => "/models/",
+  getModels: () => "models/",
 
   // Auth
-  login: () => "/auth/login/",
-  register: () => "/auth/register/",
-  tokenRefresh: () => "/auth/token/refresh/",
-  logout: () => "/auth/logout/",
+  login: () => "auth/login/",
+  register: () => "auth/register/",
+  tokenRefresh: () => "auth/token/refresh/",
+  logout: () => "auth/logout/",
 };
 
 // ==========================

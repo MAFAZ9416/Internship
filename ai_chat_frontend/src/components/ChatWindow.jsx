@@ -19,6 +19,9 @@ export default function ChatWindow({
 
   useEffect(() => {
     scrollToBottom();
+    const handleScrollEvent = () => scrollToBottom();
+    window.addEventListener("chat-scroll", handleScrollEvent);
+    return () => window.removeEventListener("chat-scroll", handleScrollEvent);
   }, [messages, isTyping]);
 
   return (

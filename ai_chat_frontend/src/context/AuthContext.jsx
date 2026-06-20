@@ -171,7 +171,7 @@ password
 const response=
 await api.post(
 
-"/auth/register/",
+"auth/register/",
 
 {
 username,

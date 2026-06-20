@@ -336,7 +336,7 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email */}
               <div>
-                <label className={`block text-xs font-bold mb-2 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Email</label>
+                <label className={`block text-xs font-bold mb-2 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Username or Email</label>
                 <div className="relative w-full">
                   <FaEnvelope
                     style={{
@@ -351,7 +351,7 @@ export default function Login() {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter your email"
+                    placeholder="Username or Email"
                     style={{
                       paddingLeft: '48px',
                       paddingRight: '48px',
@@ -554,7 +554,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Email</label>
+              <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Username or Email</label>
               <div className="relative w-full">
                 <FaEnvelope
                   style={{
@@ -569,7 +569,7 @@ export default function Login() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter your email"
+                  placeholder="Username or Email"
                   style={{
                     paddingLeft: '48px',
                     paddingRight: '48px',
