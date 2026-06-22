@@ -133,7 +133,7 @@ const SecureIcon = () => (
 );
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -176,7 +176,7 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
-    if (!username.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim()) {
       setError("Please fill all fields");
       return;
     }
@@ -184,7 +184,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await login(username, password);
+      await login(email, password);
       navigate("/chat");
     } catch (err) {
       if (err.response) {
@@ -334,9 +334,9 @@ export default function Login() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email */}
+              {/* Email Address */}
               <div>
-                <label className={`block text-xs font-bold mb-2 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Username or Email</label>
+                <label className={`block text-xs font-bold mb-2 uppercase tracking-wider ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Email Address</label>
                 <div className="relative w-full">
                   <FaEnvelope
                     style={{
@@ -348,10 +348,10 @@ export default function Login() {
                     className="text-gray-400 pointer-events-none z-10"
                   />
                   <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Username or Email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
                     style={{
                       paddingLeft: '48px',
                       paddingRight: '48px',
@@ -552,9 +552,9 @@ export default function Login() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
+            {/* Email Address */}
             <div>
-              <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Username or Email</label>
+              <label className={`block text-xs font-bold mb-1.5 uppercase ${theme === "dark" ? "text-[#94A3B8]" : "text-slate-600"}`}>Email Address</label>
               <div className="relative w-full">
                 <FaEnvelope
                   style={{
@@ -566,10 +566,10 @@ export default function Login() {
                   className="text-gray-400 pointer-events-none z-10"
                 />
                 <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Username or Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
                   style={{
                     paddingLeft: '48px',
                     paddingRight: '48px',

@@ -131,7 +131,7 @@ async function runMobileQA() {
       await wait(1500);
 
       console.log(`[${name}] Filling Login form (visible fields)...`);
-      await page.locator("input[placeholder='Enter your email']").filter({ visible: true }).first().fill(testUser);
+      await page.locator("input[placeholder='Enter your email']").filter({ visible: true }).first().fill(testEmail);
       await wait(800);
       await page.locator("input[placeholder='Enter your password']").filter({ visible: true }).first().fill(testPassword);
       await wait(1200);

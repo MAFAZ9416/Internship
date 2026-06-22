@@ -77,7 +77,7 @@ setLoading(false);
 const login=useCallback(
 
 async(
-username,
+email,
 password
 )=>{
 
@@ -87,7 +87,7 @@ await api.post(
 "/auth/login/",
 
 {
-username,
+email,
 password
 }
 
@@ -126,7 +126,7 @@ const userInfo=
 userData ||
 
 {
-username
+email
 };
 
 
@@ -163,7 +163,7 @@ return response.data;
 const register=useCallback(
 
 async(
-username,
+full_name,
 email,
 password
 )=>{
@@ -174,7 +174,7 @@ await api.post(
 "auth/register/",
 
 {
-username,
+full_name,
 email,
 password
 }
@@ -222,6 +222,42 @@ window.location.href="/login";
 
 
 
+/* Update Profile */
+
+const updateProfile = useCallback(
+
+async (formData) => {
+
+const response = await api.put(
+"auth/profile/",
+formData,
+{
+headers: {
+"Content-Type": "multipart/form-data",
+},
+}
+);
+
+const updatedUser = response.data;
+
+localStorage.setItem(
+"user",
+JSON.stringify(updatedUser)
+);
+
+setUser(updatedUser);
+
+return updatedUser;
+
+},
+
+[]
+
+);
+
+
+
+
 const value={
 
 user,
@@ -229,11 +265,13 @@ loading,
 login,
 register,
 logout,
+updateProfile,
 
 isAuthenticated:
 !!user
 
 };
+
 
 
 

@@ -201,7 +201,7 @@ async function runE2E() {
 
     // Fill Login Form
     console.log("Logging in with newly created user...");
-    await page.locator("input[placeholder='Enter your email']").first().fill(testUser);
+    await page.locator("input[placeholder='Enter your email']").first().fill(testEmail);
     await page.locator("input[placeholder='Enter your password']").first().fill(testPassword);
     await page.waitForTimeout(500);
     await page.locator("button[type='submit']").first().click();
@@ -507,7 +507,7 @@ async function runE2E() {
       // Perform a quick login in mobile view to reach the chat page
       await mPage.goto(`${BASE_URL}/login`);
       await mPage.waitForLoadState("networkidle");
-      await mPage.locator("input[placeholder='Enter your email']").filter({ visible: true }).first().fill(testUser);
+      await mPage.locator("input[placeholder='Enter your email']").filter({ visible: true }).first().fill(testEmail);
       await mPage.locator("input[placeholder='Enter your password']").filter({ visible: true }).first().fill(testPassword);
       await mPage.locator("button[type='submit']").filter({ visible: true }).first().click();
       await mPage.waitForURL("**/chat", { timeout: 10000 });

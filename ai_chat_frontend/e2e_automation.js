@@ -268,7 +268,7 @@ async function runE2E() {
   await runTest("Login with valid credentials", async () => {
     const usernameInput = page.locator("input[placeholder='Enter your email']").first();
     await usernameInput.fill(""); // Clear first
-    await usernameInput.fill(testUser);
+    await usernameInput.fill(testEmail);
     
     const passInput = page.locator("input[placeholder='Enter your password']").first();
     await passInput.fill(""); // Clear first

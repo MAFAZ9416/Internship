@@ -42,6 +42,8 @@ urlpatterns = [
 
 ]
 
+from django.conf.urls.static import static
+
 # Serve media files in development or when explicitly enabled in production
 if settings.DEBUG or os.getenv("SERVE_MEDIA_FROM_DJANGO", "False").lower() in ("1", "true", "yes"):
     urlpatterns += [
@@ -49,3 +51,9 @@ if settings.DEBUG or os.getenv("SERVE_MEDIA_FROM_DJANGO", "False").lower() in ("
             'document_root': settings.MEDIA_ROOT,
         }),
     ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )

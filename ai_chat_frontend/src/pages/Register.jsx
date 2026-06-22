@@ -127,7 +127,7 @@ const SyncIcon = () => (
 );
 
 export default function Register() {
-  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -173,7 +173,7 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
-    if (!username.trim() || !email.trim() || !password.trim()) {
+    if (!fullName.trim() || !email.trim() || !password.trim()) {
       setError("Please fill in all fields");
       return;
     }
@@ -189,13 +189,13 @@ export default function Register() {
     setIsLoading(true);
 
     try {
-      await register(username, email, password);
+      await register(fullName, email, password);
       navigate("/login");
     } catch (err) {
       if (err.response) {
         const d = err.response.data;
         if (typeof d === "string") setError(d);
-        else if (d.username) setError(`Username: ${d.username.join(", ")}`);
+        else if (d.full_name) setError(`Full Name: ${d.full_name.join(", ")}`);
         else if (d.email) setError(`Email: ${d.email.join(", ")}`);
         else if (d.password) setError(`Password: ${d.password.join(", ")}`);
         else if (d.detail) setError(d.detail);
@@ -370,8 +370,8 @@ export default function Register() {
                   />
                   <input
                     type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     placeholder="Enter your full name"
                     style={{
                       paddingLeft: '48px',
@@ -689,8 +689,8 @@ export default function Register() {
                 />
                 <input
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="Enter your full name"
                   style={{
                     paddingLeft: '48px',

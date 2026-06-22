@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import api, { apiMethods } from "../services/api";
+import api, { apiMethods, API_HOST } from "../services/api";
 
 import {
   FaEdit,
@@ -41,7 +41,9 @@ export default function Sidebar({
 
   // Add these for mobile support
   isMobileOpen = false,
-  onCloseMobile
+  onCloseMobile,
+
+  onOpenProfile
 
 }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,9 +63,14 @@ export default function Sidebar({
     return () => document.removeEventListener("click", handleOutsideClick);
   }, []);
 
+  const API_URL = import.meta.env.DEV ? "http://localhost:8000" : "https://novaai-60e1.onrender.com";
+  const avatarUrl = user?.avatar
+    ? (user.avatar.startsWith("http") ? user.avatar : `${API_URL}${user.avatar}`)
+    : null;
+
   const initials = useMemo(() => {
-    if (!user?.username) return "AI";
-    return user.username
+    if (!user?.full_name) return "AI";
+    return user.full_name
       .split(" ")
       .filter(Boolean)
       .map((word) => word[0])
@@ -364,27 +371,41 @@ export default function Sidebar({
   const renderProfileCard = () => (
     <div className="space-y-3">
       {/* Frosted glass details card */}
-      <div className={`p-4 rounded-2xl border transition-all duration-300 backdrop-blur-sm ${
-        theme === "dark" 
-          ? "bg-white/5 border-white/5 hover:border-white/10" 
-          : "bg-slate-50 border-slate-200 shadow-sm"
-      }`}>
+      <div 
+        onClick={onOpenProfile}
+        className={`p-4 rounded-2xl border transition-all duration-300 backdrop-blur-sm cursor-pointer ${
+          theme === "dark" 
+            ? "bg-white/5 border-white/5 hover:border-white/10" 
+            : "bg-slate-50 border-slate-200 shadow-sm hover:bg-slate-100"
+        }`}
+      >
         <div className="flex items-center gap-3 justify-between">
           <div className="flex items-center gap-3 min-w-0">
             {/* Round avatar */}
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-extrabold text-sm shadow-md flex-shrink-0 select-none">
-              {initials}
-            </div>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={user.full_name}
+                className="user-avatar w-10 h-10 rounded-full object-cover flex-shrink-0 shadow-md"
+              />
+            ) : (
+              <div className="avatar-fallback w-10 h-10 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-extrabold text-sm shadow-md flex-shrink-0 select-none">
+                {initials}
+              </div>
+            )}
             <div className="min-w-0">
               <p className={`text-xs font-bold truncate ${theme === "dark" ? "text-white" : "text-slate-800"}`}>
-                {user?.username || "AI Chat User"}
+                {user?.full_name || "AI Chat User"}
               </p>
               <p className={`text-[9px] truncate mt-0.5 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>
                 {user?.email || ""}
               </p>
             </div>
           </div>
-          <button className="text-gray-500 hover:text-white transition p-1 cursor-pointer">
+          <button 
+            onClick={(e) => { e.stopPropagation(); onOpenProfile?.(); }}
+            className="text-gray-500 hover:text-white transition p-1 cursor-pointer"
+          >
             <FaEllipsisH size={12} />
           </button>
         </div>

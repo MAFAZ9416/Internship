@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import MessageBubble from "./MessageBubble";
+import { useAuth } from "../context/AuthContext";
 
 export default function ChatWindow({
   messages,
@@ -9,9 +10,34 @@ export default function ChatWindow({
   onDeleteMessage,
   onRegenerateMessage
 }) {
+  const { user } = useAuth();
   const theme = localStorage.getItem("theme") || "dark";
   const isMobile = window.innerWidth < 768;
   const messagesEndRef = useRef(null);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+  const greeting = getGreeting();
+
+  const API_URL = import.meta.env.DEV ? "http://localhost:8000" : "https://novaai-60e1.onrender.com";
+  const avatarUrl = user?.avatar
+    ? (user.avatar.startsWith("http") ? user.avatar : `${API_URL}${user.avatar}`)
+    : null;
+
+  const initials = React.useMemo(() => {
+    if (!user?.full_name) return "AI";
+    return user.full_name
+      .split(" ")
+      .filter(Boolean)
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  }, [user]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,10 +54,22 @@ export default function ChatWindow({
     <div className="w-full h-full flex flex-col">
       {messages.length === 0 ? (
         <div className={`h-full flex flex-col justify-center items-center text-center p-8 select-none overflow-y-auto ${isMobile ? 'pb-36' : ''}`}>
-          <div className="text-6xl mb-4 animate-float drop-shadow-[0_0_20px_rgba(124,58,237,0.5)]">💬</div>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={user.full_name || "User"}
+              className="user-avatar w-20 h-20 rounded-full object-cover mb-4 shadow-lg border-2 border-purple-500/20 animate-float"
+            />
+          ) : (
+            <div className="avatar-fallback w-20 h-20 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-extrabold text-2xl shadow-lg mb-4 animate-float border-2 border-purple-500/20 select-none">
+              {initials}
+            </div>
+          )}
           <h1 className="text-3xl font-extrabold tracking-tight text-gradient mb-3">
-            Start a Conversation
+            {greeting},<br />
+            {user?.full_name || "AI Chat User"}
           </h1>
+
           <p className={`text-xs mb-8 ${theme === "dark" ? "text-gray-400" : "text-slate-500"}`}>
             Ask me anything! I am here to help you analyze files, answer queries, and spark insights.
           </p>

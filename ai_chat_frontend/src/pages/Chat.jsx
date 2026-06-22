@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import api, { apiMethods, API_HOST } from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import ProfileModal from "../components/ProfileModal";
 
 import Sidebar from "../components/Sidebar";
 import ChatWindow from "../components/ChatWindow";
@@ -25,6 +26,7 @@ export default function Chat() {
   const [conversations, setConversations] = useState([]);
   const [archivedConversations, setArchivedConversations] = useState([]);
   const [currentConversationId, setCurrentConversationId] = useState(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const [isTyping, setIsTyping] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -50,9 +52,14 @@ export default function Chat() {
     return `${API_HOST.replace(/\/$/, "")}${filePath.startsWith("/") ? "" : "/"}${filePath}`;
   };
 
+  const API_URL = import.meta.env.DEV ? "http://localhost:8000" : "https://novaai-60e1.onrender.com";
+  const avatarUrl = user?.avatar
+    ? (user.avatar.startsWith("http") ? user.avatar : `${API_URL}${user.avatar}`)
+    : null;
+
   const initials = useMemo(() => {
-    if (!user?.username) return "AI";
-    return user.username
+    if (!user?.full_name) return "AI";
+    return user.full_name
       .split(" ")
       .filter(Boolean)
       .map((word) => word[0])
@@ -762,6 +769,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
         onToggleCollapsed={setIsCollapsed}
         showArchivedChats={showArchivedChats}
         onToggleShowArchivedChats={setShowArchivedChats}
+        onOpenProfile={() => setIsProfileOpen(true)}
       />
 
       {/* Main Chat Viewport */}
@@ -887,9 +895,9 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
                     <FaTrash size={12} />
                   </button>
                   <button
-                    onClick={() => alert("Settings")}
+                    onClick={() => setIsProfileOpen(true)}
                     className="p-1.5 hover:text-white hover:bg-white/5 rounded-xl transition cursor-pointer"
-                    title="Ellipsis"
+                    title="Profile Settings"
                   >
                     <FaEllipsisH size={12} />
                   </button>
@@ -918,9 +926,22 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
                 </button>
               </div>
 
-              {/* Dynamic Initials Avatar */}
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-extrabold text-sm shadow-md flex-shrink-0 select-none border border-white/10">
-                {initials}
+              {/* Dynamic Initials Avatar / Click to open profile */}
+              <div 
+                onClick={() => setIsProfileOpen(true)}
+                className="cursor-pointer hover:scale-105 active:scale-95 transition-all duration-150"
+              >
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={user.full_name}
+                    className="user-avatar w-10 h-10 rounded-full object-cover flex-shrink-0 shadow-md border border-white/10"
+                  />
+                ) : (
+                  <div className="avatar-fallback w-10 h-10 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] flex items-center justify-center text-white font-extrabold text-sm shadow-md flex-shrink-0 select-none border border-white/10">
+                    {initials}
+                  </div>
+                )}
               </div>
             </div>
           </header>
@@ -1079,6 +1100,7 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
                  onToggleShowArchivedChats={setShowArchivedChats}
                  isMobileOpen={isMobileSidebarOpen}
                  onCloseMobile={() => setIsMobileSidebarOpen(false)}
+                 onOpenProfile={() => setIsProfileOpen(true)}
                />
             )}
           </div>
@@ -1101,6 +1123,12 @@ ${response.data.transcript && response.data.transcript !== "Audio extraction not
           </div>
         )}
 
+      {isProfileOpen && (
+        <ProfileModal
+          onClose={() => setIsProfileOpen(false)}
+          theme={theme}
+        />
+      )}
       </div>
       
     </div>

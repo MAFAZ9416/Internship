@@ -109,7 +109,7 @@ async function runMobileQA() {
       await takeScreenshot("2_login");
 
       // Fill & Submit Login
-      await page.locator("input[placeholder='Enter your email']").first().fill(testUser);
+      await page.locator("input[placeholder='Enter your email']").first().fill(testEmail);
       await page.locator("input[placeholder='Enter your password']").first().fill(testPassword);
       
       await Promise.all([

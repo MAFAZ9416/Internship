@@ -21,7 +21,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 if not SECRET_KEY:
     raise ImproperlyConfigured("The SECRET_KEY environment variable must be set.")
 
-DEBUG = False
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
 ALLOWED_HOSTS = [
     "novaai-60e1.onrender.com",

@@ -1,9 +1,10 @@
 import axios from "axios";
 
-const DEFAULT_BACKEND = import.meta.env.DEV ? "http://127.0.0.1:8000" : "https://novaai-60e1.onrender.com";
+const DEFAULT_BACKEND = import.meta.env.DEV ? "http://localhost:8000" : "https://novaai-60e1.onrender.com";
 const API_BASE = (import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") || DEFAULT_BACKEND);
 export const BASE_URL = API_BASE.endsWith("/api") ? `${API_BASE}/` : `${API_BASE}/api/`;
 export const API_HOST = BASE_URL.replace(/\/api\/$/, "");
+export const API_URL = import.meta.env.DEV ? "http://localhost:8000" : "https://novaai-60e1.onrender.com";
 
 const api = axios.create({
   baseURL: BASE_URL,
