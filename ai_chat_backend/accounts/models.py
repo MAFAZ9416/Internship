@@ -20,6 +20,15 @@ class User(AbstractUser):
         default='user'
     )
 
+    @property
+    def avatar_url(self):
+        try:
+            if self.profile and self.profile.avatar:
+                return self.profile.avatar.url
+        except Exception:
+            pass
+        return None
+
 class UserProfile(models.Model):
     user = models.OneToOneField(
         'accounts.User',

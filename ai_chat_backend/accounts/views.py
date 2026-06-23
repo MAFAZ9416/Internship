@@ -48,9 +48,11 @@ class CustomLoginView(APIView):
                     "id": authenticated_user.id,
                     "full_name": profile.full_name,
                     "email": authenticated_user.email,
-                    "avatar": profile.avatar.url if profile.avatar else None,
+                    "avatar": request.build_absolute_uri(profile.avatar.url) if profile.avatar else None,
                     "bio": profile.bio,
                     "date_joined": authenticated_user.date_joined.isoformat(),
+                    "is_staff": authenticated_user.is_staff,
+                    "is_superuser": authenticated_user.is_superuser,
                 }
             }, status=status.HTTP_200_OK)
         except Exception as e:

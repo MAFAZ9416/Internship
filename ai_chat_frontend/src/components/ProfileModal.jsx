@@ -15,15 +15,13 @@ export default function ProfileModal({ onClose, theme }) {
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef(null);
 
-  const API_URL = import.meta.env.DEV ? "http://localhost:8000" : "https://novaai-60e1.onrender.com";
-
   useEffect(() => {
     if (user) {
       setFullName(user.full_name || "");
       setEmail(user.email || "");
       setBio(user.bio || "");
       if (user.avatar) {
-        setAvatarPreview(user.avatar.startsWith("http") ? user.avatar : `${API_URL}${user.avatar}`);
+        setAvatarPreview(user.avatar);
       } else {
         setAvatarPreview("");
       }

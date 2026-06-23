@@ -3,6 +3,7 @@ import { useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Chat from "./pages/Chat";
+import AdminDashboard from "./pages/AdminDashboard";
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -20,6 +21,24 @@ function ProtectedRoute({ children }) {
   }
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
+
+// Admin route wrapper — redirect to chat if not staff/superuser
+function AdminRoute({ children }) {
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center" style={{ background: 'var(--color-bg-primary)' }}>
+        <div className="w-12 h-12 rounded-full border-2 mx-auto" style={{ borderColor: 'var(--color-border-primary)', borderTopColor: 'var(--color-accent-blue)', animation: 'spin 1s linear infinite' }} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!user?.is_staff && !user?.is_superuser) return <Navigate to="/chat" replace />;
+
+  return children;
 }
 
 // Public route wrapper — redirect to chat if already logged in
@@ -43,6 +62,7 @@ function AppRoutes() {
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
       <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+      <Route path="/admin-dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
       <Route path="*" element={<Navigate to="/chat" replace />} />
     </Routes>
   );

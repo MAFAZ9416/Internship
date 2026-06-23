@@ -23,10 +23,7 @@ export default function ChatWindow({
   };
   const greeting = getGreeting();
 
-  const API_URL = import.meta.env.DEV ? "http://localhost:8000" : "https://novaai-60e1.onrender.com";
-  const avatarUrl = user?.avatar
-    ? (user.avatar.startsWith("http") ? user.avatar : `${API_URL}${user.avatar}`)
-    : null;
+  const avatarUrl = user?.avatar || null;
 
   const initials = React.useMemo(() => {
     if (!user?.full_name) return "AI";

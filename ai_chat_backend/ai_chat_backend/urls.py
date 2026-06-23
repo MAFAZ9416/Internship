@@ -8,6 +8,13 @@ from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView
 )
+from accounts.admin_views import (
+    AdminStatsView,
+    AdminUsersView,
+    AdminConversationsView,
+    AdminMessagesView,
+    AdminUploadsView
+)
 
 urlpatterns = [
 
@@ -19,6 +26,21 @@ urlpatterns = [
     path(
         'api/auth/',
         include('accounts.urls')
+    ),
+
+    path(
+        'api/admin/',
+        include(([
+            path('stats/', AdminStatsView.as_view(), name='admin-stats'),
+            path('users/', AdminUsersView.as_view(), name='admin-users'),
+            path('users/<uuid:pk>/', AdminUsersView.as_view(), name='admin-users-detail'),
+            path('conversations/', AdminConversationsView.as_view(), name='admin-conversations'),
+            path('conversations/<uuid:pk>/', AdminConversationsView.as_view(), name='admin-conversations-detail'),
+            path('messages/', AdminMessagesView.as_view(), name='admin-messages'),
+            path('messages/<int:pk>/', AdminMessagesView.as_view(), name='admin-messages-detail'),
+            path('uploads/', AdminUploadsView.as_view(), name='admin-uploads'),
+            path('uploads/<int:pk>/', AdminUploadsView.as_view(), name='admin-uploads-detail'),
+        ], 'admin_api'))
     ),
 
     path(

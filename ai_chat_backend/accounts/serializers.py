@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import UserProfile
+from PIL import Image
 
 User = get_user_model()
 
@@ -40,9 +41,30 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
 
+class CustomAvatarField(serializers.FileField):
+    def to_representation(self, value):
+        if not value:
+            return None
+        
+        if isinstance(value, str):
+            return value
+
+        try:
+            url = value.url
+        except AttributeError:
+            return None
+
+        request = self.context.get('request')
+        if request is not None:
+            return request.build_absolute_uri(url)
+        return url
+
 class UserProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email')
     date_joined = serializers.DateTimeField(source='user.date_joined', read_only=True)
+    is_staff = serializers.BooleanField(source='user.is_staff', read_only=True)
+    is_superuser = serializers.BooleanField(source='user.is_superuser', read_only=True)
+    avatar = CustomAvatarField(required=False, allow_null=True)
 
     class Meta:
         model = UserProfile
@@ -51,7 +73,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'email',
             'avatar',
             'bio',
-            'date_joined'
+            'date_joined',
+            'is_staff',
+            'is_superuser'
         ]
 
     def validate_email(self, value):
@@ -61,6 +85,39 @@ class UserProfileSerializer(serializers.ModelSerializer):
             queryset = queryset.exclude(id=user.id)
         if queryset.exists():
             raise serializers.ValidationError("A user with this email address already exists.")
+        return value
+
+    def validate_avatar(self, value):
+        if not value:
+            return value
+
+        # Check file size (max 5MB)
+        max_size = 5 * 1024 * 1024
+        if value.size > max_size:
+            raise serializers.ValidationError("File size exceeds the maximum limit of 5MB.")
+
+        # Check content type
+        allowed_types = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ]
+        content_type = getattr(value, 'content_type', '')
+        if content_type not in allowed_types:
+            raise serializers.ValidationError("Only JPG, PNG and WEBP files are allowed.")
+
+        # Check actual image integrity and format using Pillow
+        try:
+            img = Image.open(value)
+            img.verify()
+            if img.format not in ['JPEG', 'PNG', 'WEBP']:
+                raise serializers.ValidationError("Only JPG, PNG and WEBP files are allowed.")
+        except Exception:
+            raise serializers.ValidationError("Only JPG, PNG and WEBP files are allowed.")
+        finally:
+            if hasattr(value, 'seek'):
+                value.seek(0)
+
         return value
 
     def update(self, instance, validated_data):
